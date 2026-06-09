@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Helicopter Fuel Planner V5 Operacional</title>
+<style>
+body{font-family:Arial;background:#0f1720;color:#fff;margin:0}
+header{background:#1b2b3a;padding:15px;text-align:center}
+.container{max-width:1200px;margin:auto;padding:15px}
+.card{background:#1f2d3a;padding:12px;border-radius:10px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+input,select,button{width:100%;padding:8px;box-sizing:border-box}
+.calcbar{background:#2b4057;padding:12px;border-radius:8px;text-align:center}
+button{font-size:18px;font-weight:bold;cursor:pointer}
+.result{line-height:1.8}
+</style>
+</head>
+<body>
+<header><h1>Calculadora de Combustível para Helicópteros V5</h1></header>
+<div class="container">
+
+<div class="card">
+<div class="grid">
+<div>
+<label>Tipo de Helicóptero</label>
+<select id="heli"></select>
+</div>
+<div>
+<label>Velocidade de Cruzeiro (kt)</label>
+<input id="vel" type="number">
+</div>
+<div>
+<label>Consumo (L/h)</label>
+<input id="cons" type="number">
+</div>
+</div>
+<p id="info"></p>
+</div>
+
+<div class="card">
+<div class="grid">
+<div>
+<label>Combustível no Tanque</label>
+<input id="fuel" type="number">
+</div>
+<div>
+<label>Unidade</label>
+<select id="unit">
+<option>KG</option>
+<option>L</option>
+<option>LB</option>
+</select>
+</div>
+<div>
+<label>Distância da Missão</label>
+<input id="dist" type="number">
+</div>
+<div>
+<label>Unidade Distância</label>
+<select id="distUnit">
+<option>NM</option>
+<option>KM</option>
+</select>
+</div>
+<div>
+<label>Tempo da Missão (min)</label>
+<input id="tempo" type="number">
+</div>
+</div>
+</div>
+
+<div class="calcbar">
+<button onclick="calcular()">CALCULAR</button>
+</div>
+
+<div class="card">
+<h3>Resultado</h3>
+<div id="out" class="result"></div>
+</div>
+
+</div>
+
+<script>
+const D=0.805;
+const DB={
+"AW119":{vel:130,cons:140,unit:"KG"},
+"AS350 B2":{vel:125,cons:180,unit:"L"},
+"AS350 B3":{vel:130,cons:190,unit:"L"},
+"H125":{vel:130,cons:190,unit:"L"},
+"H145":{vel:140,cons:280,unit:"KG"},
+"Bell 412":{vel:135,cons:420,unit:"LB"},
+"Bell 429":{vel:150,cons:300,unit:"LB"},
+"AW139":{vel:165,cons:600,unit:"KG"},
+"R44":{vel:110,cons:60,unit:"L"},
+"R66":{vel:120,cons:95,unit:"L"}
+};
+
+const heli=document.getElementById("heli");
+for(let k in DB){
+ let o=document.createElement("option");
+ o.value=k;o.textContent=k;
+ heli.appendChild(o);
+}
+
+function carregar(){
+ let a=DB[heli.value];
+ vel.value=a.vel;
+ cons.value=a.cons;
+ unit.value=a.unit;
+ info.innerHTML=`Velocidade padrão: ${a.vel} kt | Consumo padrão: ${a.cons} L/h`;
+}
+heli.onchange=carregar;
+
+function fmtHora(h){
+ let hh=Math.floor(h);
+ let mm=Math.round((h-hh)*60);
+ return `${hh}h${String(mm).padStart(2,'0')}min (${h.toFixed(1)})`;
+}
+
+function litros(valor,u){
+ if(!valor) return 0;
+ if(u==="L") return valor;
+ if(u==="KG") return valor/D;
+ if(u==="LB") return (valor/2.20462)/D;
+}
+
+function calcular(){
+ let a=DB[heli.value];
+ let velocidade=parseFloat(vel.value||0);
+ let consumo=parseFloat(cons.value||0);
+
+ let fuel=parseFloat(document.getElementById("fuel").value||0);
+ let l=litros(fuel,unit.value);
+ let kg=l*D;
+ let lb=kg*2.20462;
+
+ let html=`
+ <b>Dados Utilizados</b><br>
+ Tipo: ${heli.value}<br>
+ Velocidade: ${velocidade} kt<br>
+ Consumo: ${consumo} L/h<hr>
+ `;
+
+ if(fuel>0){
+   let aut=l/consumo;
+   let alc=aut*velocidade;
+   html+=`
+   <b>Combustível no Tanque</b><br>
+   ${l.toFixed(1)} L | ${kg.toFixed(1)} kg | ${lb.toFixed(1)} lb<br>
+   Tempo Máximo: ${fmtHora(aut)}<br>
+   Alcance Máximo: ${alc.toFixed(1)} NM (${(alc*1.852).toFixed(0)} km)<hr>
+   `;
+ }
+
+ let dist=parseFloat(document.getElementById("dist").value||0);
+ if(dist>0){
+   let nm = distUnit.value==="KM" ? dist/1.852 : dist;
+   let tempo=nm/velocidade;
+   let gasto=tempo*consumo;
+
+   html+=`
+   <b>Missão por Distância</b><br>
+   ${nm.toFixed(1)} NM (${(nm*1.852).toFixed(0)} km)<br>
+   Tempo de voo: ${fmtHora(tempo)}<br>
+   Consumo: ${gasto.toFixed(1)} L | ${(gasto*D).toFixed(1)} kg | ${((gasto*D)*2.20462).toFixed(1)} lb<br>
+   `;
+
+   if(fuel>0){
+      let rem=l-gasto;
+      html+=`Combustível remanescente: ${Math.max(rem,0).toFixed(1)} L | ${(Math.max(rem,0)*D).toFixed(1)} kg | ${((Math.max(rem,0)*D)*2.20462).toFixed(1)} lb<br>`;
+      html+= rem>=0 ? "🟢 MISSÃO VIÁVEL<hr>" : "🔴 COMBUSTÍVEL INSUFICIENTE<hr>";
+   }
+ }
+
+ let min=parseFloat(document.getElementById("tempo").value||0);
+ if(min>0){
+   let h=min/60;
+   let dnm=h*velocidade;
+   let gasto=h*consumo;
+
+   html+=`
+   <b>Missão por Tempo</b><br>
+   Tempo informado: ${fmtHora(h)}<br>
+   Distância: ${dnm.toFixed(1)} NM (${(dnm*1.852).toFixed(0)} km)<br>
+   Consumo: ${gasto.toFixed(1)} L | ${(gasto*D).toFixed(1)} kg | ${((gasto*D)*2.20462).toFixed(1)} lb<br>
+   `;
+
+   if(fuel>0){
+      let rem=l-gasto;
+      html+=`Combustível remanescente: ${Math.max(rem,0).toFixed(1)} L | ${(Math.max(rem,0)*D).toFixed(1)} kg | ${((Math.max(rem,0)*D)*2.20462).toFixed(1)} lb<br>`;
+      html+= rem>=0 ? "🟢 MISSÃO VIÁVEL" : "🔴 COMBUSTÍVEL INSUFICIENTE";
+   }
+ }
+
+ out.innerHTML=html;
+}
+carregar();
+</script>
+</body>
+</html>
