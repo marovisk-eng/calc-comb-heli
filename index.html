@@ -155,11 +155,11 @@ if(a.consLabel==="lb/h"){
  let kg=l*D;
  let lb=kg*2.20462;
 
- let html=`
+  let html=`
  <b>Dados Utilizados</b><br>
- Tipo: ${heli.value}<br>
- Velocidade: ${velocidade} kt<br>
- Consumo: ${consumo} L/h<hr>
+ Tipo de Helicóptero: ${heli.value}<br>
+ Velocidade: ${velocidade.toFixed(0)} kt<br>
+ Consumo: ${consumo.toFixed(1)} L/h<hr>
  `;
 
  if(fuel>0){
