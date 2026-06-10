@@ -70,8 +70,9 @@ button{font-size:18px;font-weight:bold;cursor:pointer}
 </div>
 </div>
 
-<div class="calcbar">
-<button onclick="calcular()">CALCULAR</button>
+<div class="calcbar" style="display:flex;gap:10px;justify-content:center;">
+    <button onclick="calcular()">CALCULAR</button>
+    <button onclick="limpar()">LIMPAR</button>
 </div>
 
 <div class="card">
@@ -213,7 +214,18 @@ if(a.consLabel==="lb/h"){
  }
 
  out.innerHTML=html;
+
 }
+function limpar(){
+
+    document.getElementById("fuel").value = "";
+    document.getElementById("dist").value = "";
+    document.getElementById("tempo").value = "";
+
+    document.getElementById("out").innerHTML = "";
+
+}
+ 
 carregar();
 </script>
 <!-- Aviso Operacional -->
