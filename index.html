@@ -64,7 +64,7 @@ button{font-size:18px;font-weight:bold;cursor:pointer}
 </select>
 </div>
 <div>
-<label>Tempo da Missão (min)</label>
+<label>Tempo da Missão (minutos)</label>
 <input id="tempo" type="number">
 </div>
 </div>
@@ -91,7 +91,7 @@ const DB={
 "H145":{vel:140,cons:280,unit:"KG"},
 "Bell 412":{vel:135,cons:420,unit:"LB"},
 "Bell 429":{vel:150,cons:300,unit:"LB"},
-"AW139":{vel:165,cons:600,unit:"KG"},
+"AW139":{vel:165,cons:400,unit:"KG"},
 "R44":{vel:110,cons:60,unit:"L"},
 "R66":{vel:120,cons:95,unit:"L"}
 };
@@ -115,6 +115,12 @@ heli.onchange=carregar;
 function fmtHora(h){
  let hh=Math.floor(h);
  let mm=Math.round((h-hh)*60);
+
+ if(mm===60){
+   hh++;
+   mm=0;
+ }
+
  return `${hh}h${String(mm).padStart(2,'0')}min (${h.toFixed(1)})`;
 }
 
@@ -199,13 +205,15 @@ carregar();
 </script>
 <!-- Aviso Operacional -->
 <div style="
-    margin-top:30px;
-    padding:20px;
-    border-radius:16px;
-    background:rgba(255,255,255,0.05);
-    border:1px solid rgba(255,255,255,0.10);
+    margin-top:25px;
+    padding:15px;
+    border-radius:12px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
     text-align:center;
-    line-height:1.8;
+    line-height:1.6;
+    font-size:12px;
+    color:#A9B4C2;
 ">
 
     <p>
@@ -236,10 +244,10 @@ carregar();
 
 <footer style="
     text-align:center;
-    margin-top:15px;
-    padding:10px;
-    opacity:0.8;
-    font-size:14px;
+    margin-top:10px;
+    padding:8px;
+    font-size:11px;
+    color:#8B98A9;
 ">
     Calculadora de Combustível para Helicópteros • Versão 5.0
 </footer>
