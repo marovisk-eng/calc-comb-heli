@@ -31,7 +31,7 @@ button{font-size:18px;font-weight:bold;cursor:pointer}
 <input id="vel" type="number">
 </div>
 <div>
-<label>Consumo (L/h)</label>
+<label id="consLabel">Consumo (L/h)</label>
 <input id="cons" type="number">
 </div>
 </div>
@@ -84,16 +84,16 @@ button{font-size:18px;font-weight:bold;cursor:pointer}
 <script>
 const D=0.805;
 const DB={
-"AW119":{vel:130,cons:180,unit:"KG"},
-"AS350 B2":{vel:125,cons:180,unit:"L"},
-"AS350 B3":{vel:130,cons:190,unit:"L"},
-"H125":{vel:130,cons:190,unit:"L"},
-"H145":{vel:140,cons:280,unit:"KG"},
-"Bell 412":{vel:135,cons:420,unit:"LB"},
-"Bell 429":{vel:150,cons:300,unit:"LB"},
-"AW139":{vel:165,cons:400,unit:"KG"},
-"R44":{vel:110,cons:60,unit:"L"},
-"R66":{vel:120,cons:95,unit:"L"}
+"AW119":{vel:130,cons:180,unit:"KG",consLabel:"kg/h"},
+"AS350 B2":{vel:125,cons:180,unit:"L",consLabel:"L/h"},
+"AS350 B3":{vel:130,cons:190,unit:"L",consLabel:"L/h"},
+"H125":{vel:130,cons:190,unit:"L",consLabel:"L/h"},
+"H145":{vel:140,cons:225,unit:"KG",consLabel:"kg/h"},
+"Bell 412":{vel:135,cons:746,unit:"LB",consLabel:"lb/h"},
+"Bell 429":{vel:150,cons:533,unit:"LB",consLabel:"lb/h"},
+"AW139":{vel:165,cons:400,unit:"KG",consLabel:"kg/h"},
+"R44":{vel:110,cons:60,unit:"L",consLabel:"L/h"},
+"R66":{vel:120,cons:95,unit:"L",consLabel:"L/h"}
 };
 
 const heli=document.getElementById("heli");
@@ -105,10 +105,16 @@ for(let k in DB){
 
 function carregar(){
  let a=DB[heli.value];
+
  vel.value=a.vel;
  cons.value=a.cons;
  unit.value=a.unit;
- info.innerHTML=`Velocidade padrão: ${a.vel} kt | Consumo padrão: ${a.cons} L/h`;
+
+ document.getElementById("consLabel").innerText =
+   `Consumo (${a.consLabel})`;
+
+ info.innerHTML =
+   `Velocidade padrão: ${a.vel} kt | Consumo padrão: ${a.cons} ${a.consLabel} | Unidade operacional: ${a.unit}`;
 }
 heli.onchange=carregar;
 
@@ -135,6 +141,13 @@ function calcular(){
  let a=DB[heli.value];
  let velocidade=parseFloat(vel.value||0);
  let consumo=parseFloat(cons.value||0);
+ if(a.consLabel==="kg/h"){
+    consumo = consumo / D;
+}
+
+if(a.consLabel==="lb/h"){
+    consumo = (consumo / 2.20462) / D;
+}
 
  let fuel=parseFloat(document.getElementById("fuel").value||0);
  let l=litros(fuel,unit.value);
