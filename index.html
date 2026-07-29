@@ -1,112 +1,821 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-W2H7N9N287"></script>
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-
-gtag('config', 'G-W2H7N9N287');
-</script>
-<!-- Fim Google Analytics -->
-    
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Calculadora de Combustível para Helicópteros V5</title>
+<meta name="theme-color" content="#08111b">
+<title>Calculadora de Combustível para Helicópteros — V6.3</title>
+
 <style>
-body{font-family:Arial;background:#0f1720;color:#fff;margin:0}
-header{background:#1b2b3a;padding:15px;text-align:center}
-.container{max-width:1200px;margin:auto;padding:15px}
-.card{background:#1f2d3a;padding:12px;border-radius:10px;margin-bottom:12px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
-input,select,button{width:100%;padding:8px;box-sizing:border-box}
-.calcbar{background:#2b4057;padding:12px;border-radius:8px;text-align:center}
-button{font-size:18px;font-weight:bold;cursor:pointer}
-.result{line-height:1.8}
+:root{
+  --bg:#08111b;
+  --panel:#0f1c2a;
+  --panel-2:#132436;
+  --panel-3:#172c41;
+  --line:#294158;
+  --text:#edf5fc;
+  --muted:#9fb1c1;
+  --accent:#55c7ff;
+  --accent-2:#8bdcff;
+  --success:#43d17b;
+  --warning:#ffbf4d;
+  --danger:#ff6666;
+  --shadow:0 16px 40px rgba(0,0,0,.28);
+  --radius:18px;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 15% -10%,rgba(85,199,255,.13),transparent 34%),
+    linear-gradient(180deg,#08111b 0%,#0a1521 48%,#08111b 100%);
+}
+
+button,input,select{font:inherit}
+
+button{border:0}
+
+.app-header{
+  position:relative;
+  overflow:hidden;
+  border-bottom:1px solid rgba(139,220,255,.16);
+  background:linear-gradient(135deg,rgba(16,34,50,.98),rgba(8,17,27,.98));
+}
+
+.app-header::after{
+  content:"";
+  position:absolute;
+  inset:auto -15% -85px auto;
+  width:330px;
+  height:190px;
+  border:1px solid rgba(85,199,255,.14);
+  border-radius:50%;
+  transform:rotate(-12deg);
+}
+
+.header-inner{
+  position:relative;
+  z-index:1;
+  max-width:1280px;
+  margin:0 auto;
+  padding:26px 20px 24px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:28px;
+}
+
+.eyebrow{
+  margin:0 0 7px;
+  color:var(--accent-2);
+  font-size:.78rem;
+  font-weight:800;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+}
+
+h1{
+  margin:0;
+  max-width:850px;
+  font-size:clamp(1.72rem,4vw,3.1rem);
+  line-height:1.02;
+  letter-spacing:-.035em;
+}
+
+.header-subtitle{
+  margin:10px 0 0;
+  color:var(--muted);
+  font-size:clamp(.95rem,2vw,1.08rem);
+}
+
+.version-chip{
+  flex:0 0 auto;
+  padding:10px 13px;
+  border:1px solid rgba(85,199,255,.32);
+  border-radius:999px;
+  color:var(--accent-2);
+  background:rgba(85,199,255,.08);
+  font-size:.77rem;
+  font-weight:900;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+
+.container{
+  max-width:1280px;
+  margin:0 auto;
+  padding:22px 20px 38px;
+}
+
+.mission-strip{
+  display:grid;
+  grid-template-columns:1.35fr .65fr .9fr;
+  gap:12px;
+  margin-bottom:16px;
+}
+
+.status-cell{
+  min-height:92px;
+  padding:15px 17px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:linear-gradient(145deg,rgba(19,36,54,.95),rgba(12,25,38,.95));
+  box-shadow:var(--shadow);
+}
+
+.status-label{
+  display:block;
+  margin-bottom:9px;
+  color:var(--muted);
+  font-size:.7rem;
+  font-weight:800;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+}
+
+.status-value{
+  display:block;
+  font-size:clamp(1.25rem,3vw,1.7rem);
+  font-weight:900;
+  letter-spacing:-.02em;
+}
+
+.unit-value{
+  color:var(--accent-2);
+  letter-spacing:.08em;
+}
+
+.parameter-status{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  color:var(--success);
+  font-size:.95rem;
+  font-weight:800;
+}
+
+.parameter-status::before{
+  content:"";
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  background:currentColor;
+  box-shadow:0 0 14px currentColor;
+}
+
+.dashboard{
+  display:grid;
+  grid-template-columns:minmax(0,1.12fr) minmax(330px,.88fr);
+  gap:16px;
+  align-items:start;
+}
+
+.panel{
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  background:linear-gradient(160deg,rgba(16,31,46,.98),rgba(10,23,35,.98));
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+
+.panel-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  padding:18px 19px 15px;
+  border-bottom:1px solid rgba(159,177,193,.12);
+}
+
+.panel-title-wrap{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
+.panel-index{
+  display:grid;
+  place-items:center;
+  width:34px;
+  height:34px;
+  border:1px solid rgba(85,199,255,.28);
+  border-radius:10px;
+  color:var(--accent-2);
+  background:rgba(85,199,255,.07);
+  font-size:.78rem;
+  font-weight:900;
+}
+
+.panel h2{
+  margin:0;
+  font-size:1.05rem;
+  letter-spacing:.02em;
+}
+
+.panel-note{
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:.83rem;
+}
+
+.panel-body{padding:18px}
+
+.section-title{
+  margin:0 0 12px;
+  color:var(--accent-2);
+  font-size:.74rem;
+  font-weight:900;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+}
+
+.field{
+  min-width:0;
+}
+
+.field.full{
+  grid-column:1 / -1;
+}
+
+label{
+  display:block;
+  margin:0 0 7px;
+  color:#dce8f2;
+  font-size:.8rem;
+  font-weight:800;
+}
+
+.input-shell{
+  position:relative;
+}
+
+input,select{
+  width:100%;
+  min-height:46px;
+  padding:11px 13px;
+  border:1px solid #355169;
+  border-radius:11px;
+  outline:none;
+  color:var(--text);
+  background:#0a1723;
+  transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease;
+}
+
+input:hover,select:hover{
+  border-color:#466a87;
+}
+
+input:focus,select:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(85,199,255,.12);
+}
+
+select{
+  appearance:none;
+  background-image:
+    linear-gradient(45deg,transparent 50%,var(--accent-2) 50%),
+    linear-gradient(135deg,var(--accent-2) 50%,transparent 50%);
+  background-position:
+    calc(100% - 17px) 20px,
+    calc(100% - 12px) 20px;
+  background-size:5px 5px,5px 5px;
+  background-repeat:no-repeat;
+}
+
+.info-box{
+  margin-top:14px;
+  padding:12px 14px;
+  border-left:3px solid var(--accent);
+  border-radius:9px;
+  color:#c9d9e7;
+  background:rgba(85,199,255,.07);
+  font-size:.86rem;
+  line-height:1.55;
+}
+
+.separator{
+  height:1px;
+  margin:18px 0;
+  background:linear-gradient(90deg,transparent,rgba(159,177,193,.22),transparent);
+}
+
+.action-bar{
+  display:grid;
+  grid-template-columns:1fr .45fr;
+  gap:12px;
+  margin-top:18px;
+}
+
+.btn{
+  min-height:50px;
+  padding:12px 16px;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:900;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  transition:transform .16s ease,filter .16s ease,border-color .16s ease;
+}
+
+.btn:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.06);
+}
+
+.btn:active{transform:translateY(0)}
+
+.btn-primary{
+  color:#04111a;
+  background:linear-gradient(135deg,var(--accent-2),var(--accent));
+}
+
+.btn-secondary{
+  color:#d8e6f0;
+  border:1px solid #3a566d;
+  background:#132438;
+}
+
+.results-panel{
+  position:sticky;
+  top:16px;
+}
+
+.result-placeholder{
+  display:grid;
+  place-items:center;
+  min-height:340px;
+  padding:30px 18px;
+  text-align:center;
+  border:1px dashed rgba(159,177,193,.22);
+  border-radius:14px;
+  color:var(--muted);
+  background:rgba(8,17,27,.44);
+}
+
+.placeholder-mark{
+  display:grid;
+  place-items:center;
+  width:64px;
+  height:64px;
+  margin:0 auto 16px;
+  border:1px solid rgba(85,199,255,.27);
+  border-radius:18px;
+  color:var(--accent-2);
+  background:rgba(85,199,255,.06);
+  font-size:1.6rem;
+  font-weight:900;
+}
+
+.result{
+  color:#dbe8f2;
+  line-height:1.75;
+}
+
+.result:empty{
+  display:none;
+}
+
+.result:not(:empty) + .result-placeholder{
+  display:none;
+}
+
+.result b{
+  color:#fff;
+  font-size:.92rem;
+}
+
+.result hr{
+  border:0;
+  height:1px;
+  margin:14px 0;
+  background:rgba(159,177,193,.17);
+}
+
+
+.result-dashboard{display:grid;gap:14px}
+.result-section{padding:14px;border:1px solid rgba(159,177,193,.16);border-radius:14px;background:rgba(8,17,27,.42)}
+.result-section-title{margin:0 0 11px;color:var(--accent-2);font-size:.75rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase}
+.result-cards,.result-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.result-card{min-width:0;padding:13px;border:1px solid #2b455c;border-radius:12px;background:linear-gradient(145deg,#13263a,#0d1c2b)}
+.result-card.wide{grid-column:1 / -1}
+.result-card-label{display:block;margin-bottom:7px;color:var(--muted);font-size:.68rem;font-weight:900;letter-spacing:.11em;text-transform:uppercase}
+.result-card-value{display:block;overflow-wrap:anywhere;color:#fff;font-size:clamp(1.03rem,2.4vw,1.35rem);font-weight:900;line-height:1.18}
+.result-card-detail{display:block;margin-top:6px;color:#aebfce;font-size:.74rem;line-height:1.45}
+.mission-state{display:flex;align-items:center;gap:9px}
+.mission-state::before{content:"";flex:0 0 auto;width:10px;height:10px;border-radius:50%;background:currentColor;box-shadow:0 0 14px currentColor}
+.state-ok{color:var(--success)}
+.state-danger{color:var(--danger)}
+.state-neutral{color:var(--muted)}
+@media (max-width:480px){
+  .result-cards,.result-summary{grid-template-columns:1fr}
+  .result-card.wide{grid-column:auto}
+}
+
+
+.capacity-note{
+  margin-top:7px;
+  color:var(--muted);
+  font-size:.72rem;
+  line-height:1.4;
+}
+
+.fuel-visual{
+  margin-top:14px;
+  padding:15px;
+  border:1px solid rgba(85,199,255,.2);
+  border-radius:14px;
+  background:rgba(8,17,27,.58);
+}
+
+.fuel-visual-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
+
+.fuel-visual-title{
+  margin:0;
+  font-size:.77rem;
+  font-weight:900;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+
+.fuel-percent{
+  color:var(--accent-2);
+  font-size:1.35rem;
+  font-weight:900;
+}
+
+.fuel-track{
+  display:flex;
+  width:100%;
+  height:20px;
+  overflow:hidden;
+  border:1px solid #355169;
+  border-radius:999px;
+  background:#08121c;
+}
+
+.fuel-segment{
+  height:100%;
+  min-width:0;
+  transition:width .35s ease;
+}
+
+.fuel-consumed{
+  background:var(--warning);
+}
+
+.fuel-remaining{
+  background:var(--success);
+}
+
+.fuel-empty{
+  background:rgba(159,177,193,.16);
+}
+
+.fuel-overflow{
+  background:var(--danger);
+}
+
+.fuel-legend{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  margin-top:12px;
+}
+
+.legend-item{
+  display:flex;
+  align-items:flex-start;
+  gap:7px;
+  color:var(--muted);
+  font-size:.7rem;
+  line-height:1.35;
+}
+
+.legend-dot{
+  flex:0 0 auto;
+  width:9px;
+  height:9px;
+  margin-top:2px;
+  border-radius:50%;
+  background:currentColor;
+}
+
+.legend-consumed{color:var(--warning)}
+.legend-remaining{color:var(--success)}
+.legend-empty{color:#8295a6}
+.legend-danger{color:var(--danger)}
+
+.fuel-warning{
+  margin-top:11px;
+  padding:10px 12px;
+  border:1px solid rgba(255,102,102,.28);
+  border-radius:10px;
+  color:#ffc0c0;
+  background:rgba(255,102,102,.07);
+  font-size:.75rem;
+  line-height:1.45;
+}
+
+@media (max-width:600px){
+  .fuel-legend{grid-template-columns:1fr}
+}
+
+.footer-note{
+  margin-top:16px;
+  padding:15px 17px;
+  border:1px solid rgba(255,191,77,.22);
+  border-radius:14px;
+  color:#c9d4df;
+  background:rgba(255,191,77,.055);
+  font-size:.79rem;
+  line-height:1.55;
+}
+
+.footer-note strong{
+  color:#ffe0a3;
+}
+
+@media (max-width:900px){
+  .header-inner{align-items:flex-start}
+  .dashboard{grid-template-columns:1fr}
+  .results-panel{position:static}
+  .mission-strip{grid-template-columns:1fr 1fr}
+  .mission-strip .status-cell:first-child{grid-column:1 / -1}
+}
+
+@media (max-width:600px){
+  .header-inner{
+    flex-direction:column;
+    padding-top:22px;
+  }
+
+  .container{padding:16px 12px 28px}
+
+  .mission-strip{grid-template-columns:1fr}
+
+  .mission-strip .status-cell:first-child{grid-column:auto}
+
+  .form-grid{grid-template-columns:1fr}
+
+  .field.full{grid-column:auto}
+
+  .action-bar{grid-template-columns:1fr}
+
+  .panel-header,.panel-body{padding-left:15px;padding-right:15px}
+}
 </style>
 </head>
+
 <body>
-<header><h1>Calculadora de Combustível para Helicópteros V5</h1></header>
-<div class="container">
+<header class="app-header">
+  <div class="header-inner">
+    <div>
+      <p class="eyebrow">Planejamento operacional de voo</p>
+      <h1>Calculadora de Combustível para Helicópteros</h1>
+      <p class="header-subtitle">Painel Operacional de Planejamento de Missão</p>
+    </div>
+    <div class="version-chip">V6.3 Operacional</div>
+  </div>
+</header>
 
-<div class="card">
-<div class="grid">
-<div>
-<label>Tipo de Helicóptero</label>
-<select id="heli"></select>
-</div>
-<div>
-<label>Velocidade de Cruzeiro (kt)</label>
-<input id="vel" type="number">
-</div>
-<div>
-<label id="consLabel">Consumo (L/h)</label>
-<input id="cons" type="number">
-</div>
-</div>
-<p id="info"></p>
-</div>
+<main class="container">
+  <section class="mission-strip" aria-label="Resumo operacional">
+    <article class="status-cell">
+      <span class="status-label">Aeronave selecionada</span>
+      <span id="aircraftDisplay" class="status-value">AW119</span>
+    </article>
 
-<div class="card">
-<div class="grid">
-<div>
-<label>Combustível no Tanque</label>
-<input id="fuel" type="number">
-</div>
-<div>
-<label>Unidade</label>
-<select id="unit">
-<option>KG</option>
-<option>L</option>
-<option>LB</option>
-</select>
-</div>
-<div>
-<label>Distância da Missão</label>
-<input id="dist" type="number">
-</div>
-<div>
-<label>Unidade Distância</label>
-<select id="distUnit">
-<option>NM</option>
-<option>KM</option>
-</select>
-</div>
-<div>
-<label>Tempo da Missão (minutos)</label>
-<input id="tempo" type="number">
-</div>
-</div>
-</div>
+    <article class="status-cell">
+      <span class="status-label">Unidade operacional</span>
+      <span id="unitDisplay" class="status-value unit-value">KG</span>
+    </article>
 
-<div class="calcbar" style="display:flex;gap:10px;justify-content:center;">
-    <button onclick="calcular()">CALCULAR</button>
-    <button onclick="limpar()">LIMPAR</button>
-</div>
+    <article class="status-cell">
+      <span class="status-label">Parâmetros da aeronave</span>
+      <span class="parameter-status">Padrão</span>
+    </article>
+  </section>
 
-<div class="card">
-<h3>Resultado</h3>
-<div id="out" class="result"></div>
-</div>
+  <section class="dashboard">
+    <div class="panel">
+      <header class="panel-header">
+        <div class="panel-title-wrap">
+          <span class="panel-index">01</span>
+          <div>
+            <h2>Configuração da missão</h2>
+            <p class="panel-note">Defina a aeronave e os parâmetros operacionais.</p>
+          </div>
+        </div>
+      </header>
 
-</div>
+      <div class="panel-body">
+        <h3 class="section-title">Aeronave e desempenho</h3>
+
+        <div class="form-grid">
+          <div class="field full">
+            <label for="heli">Tipo de helicóptero</label>
+            <select id="heli"></select>
+          </div>
+
+          <div class="field">
+            <label for="vel">Velocidade de cruzeiro (kt)</label>
+            <input id="vel" type="number" inputmode="decimal">
+          </div>
+
+          <div class="field">
+            <label id="consLabel" for="cons">Consumo</label>
+            <input id="cons" type="number" inputmode="decimal">
+          </div>
+        </div>
+
+        <p id="info" class="info-box"></p>
+
+        <div class="separator"></div>
+
+        <h3 class="section-title">Combustível e perfil da missão</h3>
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="fuel">Combustível no tanque</label>
+            <input id="fuel" type="number" inputmode="decimal">
+          </div>
+
+          <div class="field">
+            <label for="unit">Unidade</label>
+            <select id="unit">
+              <option>KG</option>
+              <option>L</option>
+              <option>LB</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="tankConfig">Configuração do tanque</label>
+            <select id="tankConfig"></select>
+          </div>
+
+          <div class="field">
+            <label for="capacity">Capacidade de referência</label>
+            <input id="capacity" type="number" inputmode="decimal" step="0.1">
+            <div id="capacityNote" class="capacity-note"></div>
+          </div>
+
+          <div class="field">
+            <label for="dist">Distância da missão</label>
+            <input id="dist" type="number" inputmode="decimal">
+          </div>
+
+          <div class="field">
+            <label for="distUnit">Unidade da distância</label>
+            <select id="distUnit">
+              <option>NM</option>
+              <option>KM</option>
+            </select>
+          </div>
+
+          <div class="field full">
+            <label for="tempo">Tempo da missão (min)</label>
+            <input id="tempo" type="number" inputmode="decimal">
+          </div>
+        </div>
+
+        <div class="action-bar">
+          <button class="btn btn-primary" type="button" onclick="calcular()">Calcular missão</button>
+          <button class="btn btn-secondary" type="button" onclick="limpar()">Limpar</button>
+        </div>
+      </div>
+    </div>
+
+    <aside class="panel results-panel">
+      <header class="panel-header">
+        <div class="panel-title-wrap">
+          <span class="panel-index">02</span>
+          <div>
+            <h2>Resultado operacional</h2>
+            <p class="panel-note">Resumo calculado da missão.</p>
+          </div>
+        </div>
+      </header>
+
+      <div class="panel-body">
+        <div id="out" class="result result-dashboard"></div>
+
+        <div class="result-placeholder">
+          <div>
+            <div class="placeholder-mark">R</div>
+            <strong>Aguardando cálculo</strong>
+            <p>Preencha os dados da missão e selecione “Calcular missão”.</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <div class="footer-note">
+    <strong>Aviso operacional:</strong>
+    esta calculadora é uma ferramenta de apoio ao planejamento. Confirme os dados da aeronave,
+    reservas, condições meteorológicas, limitações operacionais e procedimentos aplicáveis antes do voo.
+  </div>
+</main>
 
 <script>
 const D=0.805;
 const DB={
-"AW119":{vel:130,cons:180,unit:"KG",consLabel:"kg/h"},
-"AS350 B2":{vel:125,cons:180,unit:"L",consLabel:"L/h"},
-"AS350 B3":{vel:130,cons:190,unit:"L",consLabel:"L/h"},
-"H125":{vel:130,cons:190,unit:"L",consLabel:"L/h"},
-"H145":{vel:140,cons:225,unit:"KG",consLabel:"kg/h"},
-"Bell 412":{vel:135,cons:746,unit:"LB",consLabel:"lb/h"},
-"Bell 429":{vel:150,cons:533,unit:"LB",consLabel:"lb/h"},
-"AW139":{vel:165,cons:400,unit:"KG",consLabel:"kg/h"},
-"R44":{vel:110,cons:60,unit:"L",consLabel:"L/h"},
-"R66":{vel:120,cons:95,unit:"L",consLabel:"L/h"}
+"AW119":{
+  vel:130,cons:180,unit:"KG",
+  tanks:[
+    {name:"Padrão",capacity:595,unit:"L",note:"Capacidade utilizável de referência; confirme a configuração da aeronave."},
+    {name:"Personalizada",capacity:595,unit:"L",custom:true,note:"Edite a capacidade conforme a configuração real."}
+  ]
+},
+"AS350 B2":{
+  vel:125,cons:180,unit:"L",
+  tanks:[
+    {name:"Padrão",capacity:540,unit:"L",note:"Capacidade nominal de referência."},
+    {name:"Personalizada",capacity:540,unit:"L",custom:true,note:"Edite conforme tanque e modificação instalada."}
+  ]
+},
+"AS350 B3":{
+  vel:130,cons:190,unit:"L",
+  tanks:[
+    {name:"Padrão",capacity:540,unit:"L",note:"Capacidade nominal de referência."},
+    {name:"Personalizada",capacity:540,unit:"L",custom:true,note:"Edite conforme tanque e modificação instalada."}
+  ]
+},
+"H125":{
+  vel:130,cons:190,unit:"L",
+  tanks:[
+    {name:"Padrão",capacity:425,unit:"KG",note:"Capacidade padrão de referência informada em massa."},
+    {name:"Personalizada",capacity:425,unit:"KG",custom:true,note:"Edite conforme a configuração real."}
+  ]
+},
+"H145":{
+  vel:140,cons:280,unit:"KG",
+  tanks:[
+    {name:"Padrão civil",capacity:723,unit:"KG",note:"Capacidade padrão de referência; versões e opções podem variar."},
+    {name:"Personalizada",capacity:723,unit:"KG",custom:true,note:"Edite conforme a configuração real."}
+  ]
+},
+"Bell 412":{
+  vel:135,cons:420,unit:"LB",
+  tanks:[
+    {name:"Padrão",capacity:1251,unit:"L",note:"Tanque padrão."},
+    {name:"Padrão + auxiliar 123 L",capacity:1374,unit:"L",note:"Inclui tanque auxiliar pequeno."},
+    {name:"Padrão + auxiliar 617 L",capacity:1868,unit:"L",note:"Inclui tanque auxiliar grande."},
+    {name:"Personalizada",capacity:1251,unit:"L",custom:true,note:"Edite conforme a configuração real."}
+  ]
+},
+"Bell 429":{
+  vel:150,cons:300,unit:"LB",
+  tanks:[
+    {name:"Padrão",capacity:821,unit:"L",note:"Capacidade padrão de referência."},
+    {name:"Padrão + auxiliar 148 L",capacity:969,unit:"L",note:"Inclui tanque auxiliar opcional."},
+    {name:"Personalizada",capacity:821,unit:"L",custom:true,note:"Edite conforme a configuração real."}
+  ]
+},
+"AW139":{
+  vel:165,cons:400,unit:"KG",
+  tanks:[
+    {name:"Padrão utilizável",capacity:1568,unit:"L",note:"Capacidade utilizável de referência; tanques auxiliares podem alterar o total."},
+    {name:"Personalizada",capacity:1568,unit:"L",custom:true,note:"Edite conforme a configuração real."}
+  ]
+},
+"R44":{
+  vel:110,cons:60,unit:"L",
+  tanks:[
+    {name:"Tanque principal",capacity:111.7,unit:"L",note:"Somente tanque principal."},
+    {name:"Principal + auxiliar",capacity:176.1,unit:"L",note:"Inclui tanque auxiliar de aproximadamente 64,4 L."},
+    {name:"Personalizada",capacity:176.1,unit:"L",custom:true,note:"Edite conforme a configuração real."}
+  ]
+},
+"R66":{
+  vel:120,cons:95,unit:"L",
+  tanks:[
+    {name:"Padrão",capacity:278.6,unit:"L",note:"Capacidade padrão de referência."},
+    {name:"Padrão + auxiliar 88 L",capacity:366.6,unit:"L",note:"Inclui tanque auxiliar Slimline."},
+    {name:"Padrão + auxiliar 165 L",capacity:443.6,unit:"L",note:"Inclui tanque auxiliar grande."},
+    {name:"Personalizada",capacity:278.6,unit:"L",custom:true,note:"Edite conforme a configuração real."}
+  ]
+}
 };
 
 const heli=document.getElementById("heli");
@@ -116,178 +825,362 @@ for(let k in DB){
  heli.appendChild(o);
 }
 
+function preencherTanques(){
+ const a=DB[heli.value];
+ tankConfig.innerHTML="";
+
+ a.tanks.forEach((tank,index)=>{
+   const option=document.createElement("option");
+   option.value=index;
+   option.textContent=tank.name;
+   tankConfig.appendChild(option);
+ });
+
+ tankConfig.value="0";
+ atualizarCapacidade();
+}
+
+function atualizarCapacidade(){
+ const a=DB[heli.value];
+ const tank=a.tanks[Number(tankConfig.value)||0];
+
+ capacity.value=Number(tank.capacity.toFixed ? tank.capacity.toFixed(1) : tank.capacity);
+ capacity.dataset.unit=tank.unit;
+ capacity.readOnly=!tank.custom;
+ capacityNote.textContent=`${tank.note} Unidade da capacidade: ${tank.unit}.`;
+}
+
 function carregar(){
  let a=DB[heli.value];
-
  vel.value=a.vel;
  cons.value=a.cons;
  unit.value=a.unit;
 
- document.getElementById("consLabel").innerText =
-   `Consumo (${a.consLabel})`;
+ document.getElementById("aircraftDisplay").textContent=heli.value;
+ document.getElementById("unitDisplay").textContent=a.unit;
+ document.getElementById("consLabel").textContent=`Consumo (${a.unit}/h)`;
+ info.innerHTML=`Velocidade padrão: ${a.vel} kt | Consumo padrão: ${a.cons} ${a.unit}/h`;
 
- info.innerHTML =
-   `Velocidade padrão: ${a.vel} kt | Consumo padrão: ${a.cons} ${a.consLabel} | Unidade operacional: ${a.unit}`;
+ preencherTanques();
 }
-heli.onchange=carregar;
+
+heli.addEventListener("change",carregar);
+tankConfig.addEventListener("change",atualizarCapacidade);
 
 function fmtHora(h){
  let hh=Math.floor(h);
  let mm=Math.round((h-hh)*60);
-
- if(mm===60){
-   hh++;
-   mm=0;
- }
-
  return `${hh}h${String(mm).padStart(2,'0')}min (${h.toFixed(1)})`;
 }
 
-function litros(valor,u){
+// Todos os cálculos internos de combustível são normalizados em litros.
+// D = densidade de referência do QAV, em kg/L.
+function paraLitros(valor,u){
  if(!valor) return 0;
  if(u==="L") return valor;
  if(u==="KG") return valor/D;
  if(u==="LB") return (valor/2.20462)/D;
+ return 0;
+}
+
+function deLitros(valorL,u){
+ if(!valorL) return 0;
+ if(u==="L") return valorL;
+ if(u==="KG") return valorL*D;
+ if(u==="LB") return valorL*D*2.20462;
+ return 0;
+}
+
+function formatarCombustivel(valorL,unidadePrincipal){
+ const valores={
+   L:deLitros(valorL,"L"),
+   KG:deLitros(valorL,"KG"),
+   LB:deLitros(valorL,"LB")
+ };
+
+ const principal=`${valores[unidadePrincipal].toFixed(1)} ${unidadePrincipal}`;
+ const equivalentes=Object.keys(valores)
+   .filter(u=>u!==unidadePrincipal)
+   .map(u=>`${valores[u].toFixed(1)} ${u}`)
+   .join(" · ");
+
+ return {principal,equivalentes};
+}
+
+function formatarTaxa(valorLHora,unidadePrincipal){
+ const taxa=formatarCombustivel(valorLHora,unidadePrincipal);
+ return {
+   principal:`${taxa.principal}/h`,
+   equivalentes:taxa.equivalentes
+     .split(" · ")
+     .map(v=>`${v}/h`)
+     .join(" · ")
+ };
+}
+
+
+function limitarPercentual(valor){
+ return Math.min(Math.max(valor,0),100);
+}
+
+function criarBarraCombustivel(capacidadeL,inicialL,consumidoL){
+ if(capacidadeL<=0 || inicialL<=0) return "";
+
+ const inicialPct=(inicialL/capacidadeL)*100;
+ const consumidoReal=Math.min(Math.max(consumidoL,0),inicialL);
+ const remanescenteReal=Math.max(inicialL-consumidoL,0);
+
+ const consumidoPct=limitarPercentual((consumidoReal/capacidadeL)*100);
+ const remanescentePct=limitarPercentual((remanescenteReal/capacidadeL)*100);
+ const vazioPct=limitarPercentual(100-consumidoPct-remanescentePct);
+ const excedente=inicialL>capacidadeL;
+
+ const consumedStyle=`width:${excedente ? 0 : consumidoPct.toFixed(2)}%`;
+ const remainingStyle=`width:${excedente ? 100 : remanescentePct.toFixed(2)}%`;
+ const emptyStyle=`width:${excedente ? 0 : vazioPct.toFixed(2)}%`;
+
+ return `
+   <div class="fuel-visual">
+     <div class="fuel-visual-head">
+       <div>
+         <h4 class="fuel-visual-title">Representação do combustível</h4>
+         <span class="result-card-detail">Percentual relativo à capacidade selecionada</span>
+       </div>
+       <div class="fuel-percent">${inicialPct.toFixed(1)}%</div>
+     </div>
+
+     <div class="fuel-track"
+          role="img"
+          aria-label="Combustível consumido ${consumidoPct.toFixed(1)} por cento, remanescente ${remanescentePct.toFixed(1)} por cento e espaço vazio ${vazioPct.toFixed(1)} por cento">
+       <div class="fuel-segment ${excedente ? "fuel-overflow" : "fuel-consumed"}" style="${consumedStyle}"></div>
+       <div class="fuel-segment ${excedente ? "fuel-overflow" : "fuel-remaining"}" style="${remainingStyle}"></div>
+       <div class="fuel-segment fuel-empty" style="${emptyStyle}"></div>
+     </div>
+
+     <div class="fuel-legend">
+       <div class="legend-item legend-consumed">
+         <span class="legend-dot"></span>
+         <span>Consumido<br><strong>${consumidoPct.toFixed(1)}%</strong></span>
+       </div>
+       <div class="legend-item legend-remaining">
+         <span class="legend-dot"></span>
+         <span>Remanescente<br><strong>${remanescentePct.toFixed(1)}%</strong></span>
+       </div>
+       <div class="legend-item legend-empty">
+         <span class="legend-dot"></span>
+         <span>Espaço vazio<br><strong>${vazioPct.toFixed(1)}%</strong></span>
+       </div>
+     </div>
+
+     ${excedente ? `
+       <div class="fuel-warning">
+         O combustível informado corresponde a ${inicialPct.toFixed(1)}% da capacidade selecionada.
+         Revise a quantidade, a unidade ou a configuração do tanque.
+       </div>
+     ` : ""}
+   </div>
+ `;
 }
 
 function calcular(){
  let a=DB[heli.value];
  let velocidade=parseFloat(vel.value||0);
  let consumo=parseFloat(cons.value||0);
- if(a.consLabel==="kg/h"){
-    consumo = consumo / D;
-}
 
-if(a.consLabel==="lb/h"){
-    consumo = (consumo / 2.20462) / D;
-}
+ if(velocidade<=0 || consumo<=0){
+   out.innerHTML=`
+     <section class="result-section">
+       <h3 class="result-section-title">Verificação necessária</h3>
+       <article class="result-card wide">
+         <span class="result-card-label">Parâmetros inválidos</span>
+         <span class="result-card-value mission-state state-danger">
+           INFORME VELOCIDADE E CONSUMO MAIORES QUE ZERO
+         </span>
+       </article>
+     </section>
+   `;
+   return;
+ }
 
  let fuel=parseFloat(document.getElementById("fuel").value||0);
- let l=litros(fuel,unit.value);
- let kg=l*D;
- let lb=kg*2.20462;
+ let capacidade=parseFloat(document.getElementById("capacity").value||0);
+ let capacidadeUnidade=capacity.dataset.unit||"L";
 
-  let html=`
- <b>Dados Utilizados</b><br>
- Tipo de Helicóptero: ${heli.value}<br>
- Velocidade: ${velocidade.toFixed(0)} kt<br>
- Consumo: ${consumo.toFixed(1)} L/h<hr>
- `;
+ // Normalização:
+ // - combustível disponível -> litros
+ // - capacidade selecionada -> litros
+ // - consumo da aeronave -> litros por hora
+ let combustivelLitros=paraLitros(fuel,unit.value);
+ let capacidadeLitros=paraLitros(capacidade,capacidadeUnidade);
+ let consumoLitrosHora=paraLitros(consumo,a.unit);
+
+ let tanqueFmt=formatarCombustivel(combustivelLitros,a.unit);
+ let taxaFmt=formatarTaxa(consumoLitrosHora,a.unit);
+
+ let sections=[];
+
+ sections.push(`
+   <section class="result-section">
+     <h3 class="result-section-title">Dados utilizados</h3>
+     <div class="result-summary">
+       <article class="result-card">
+         <span class="result-card-label">Aeronave</span>
+         <span class="result-card-value">${heli.value}</span>
+       </article>
+       <article class="result-card">
+         <span class="result-card-label">Unidade operacional</span>
+         <span class="result-card-value unit-value">${a.unit}</span>
+       </article>
+       <article class="result-card">
+         <span class="result-card-label">Velocidade</span>
+         <span class="result-card-value">${velocidade} kt</span>
+       </article>
+       <article class="result-card">
+         <span class="result-card-label">Consumo informado</span>
+         <span class="result-card-value">${taxaFmt.principal}</span>
+         <span class="result-card-detail">${taxaFmt.equivalentes}</span>
+       </article>
+       <article class="result-card wide">
+         <span class="result-card-label">Configuração do tanque</span>
+         <span class="result-card-value">${a.tanks[Number(tankConfig.value)||0].name}</span>
+         <span class="result-card-detail">Capacidade: ${capacidade.toFixed(1)} ${capacidadeUnidade}</span>
+       </article>
+     </div>
+   </section>
+ `);
 
  if(fuel>0){
-   let aut=l/consumo;
-   let alc=aut*velocidade;
-   html+=`
-   <b>Combustível no Tanque</b><br>
-   ${l.toFixed(1)} L | ${kg.toFixed(1)} kg | ${lb.toFixed(1)} lb<br>
-   Tempo Máximo: ${fmtHora(aut)}<br>
-   Alcance Máximo: ${alc.toFixed(1)} NM (${(alc*1.852).toFixed(0)} km)<hr>
-   `;
+   let autonomia=combustivelLitros/consumoLitrosHora;
+   let alcance=autonomia*velocidade;
+
+   sections.push(`
+     <section class="result-section">
+       <h3 class="result-section-title">Combustível disponível</h3>
+       <div class="result-cards">
+         <article class="result-card">
+           <span class="result-card-label">Tempo máximo</span>
+           <span class="result-card-value">${fmtHora(autonomia)}</span>
+         </article>
+         <article class="result-card">
+           <span class="result-card-label">Alcance máximo</span>
+           <span class="result-card-value">${alcance.toFixed(1)} NM</span>
+           <span class="result-card-detail">${(alcance*1.852).toFixed(0)} km</span>
+         </article>
+         <article class="result-card wide">
+           <span class="result-card-label">Combustível no tanque</span>
+           <span class="result-card-value">${tanqueFmt.principal}</span>
+           <span class="result-card-detail">${tanqueFmt.equivalentes}</span>
+         </article>
+       </div>
+       ${criarBarraCombustivel(capacidadeLitros,combustivelLitros,0)}
+     </section>
+   `);
  }
 
  let dist=parseFloat(document.getElementById("dist").value||0);
  if(dist>0){
-   let nm = distUnit.value==="KM" ? dist/1.852 : dist;
+   let nm=distUnit.value==="KM" ? dist/1.852 : dist;
    let tempo=nm/velocidade;
-   let gasto=tempo*consumo;
+   let gastoLitros=tempo*consumoLitrosHora;
+   let gastoFmt=formatarCombustivel(gastoLitros,a.unit);
 
-   html+=`
-   <b>Missão por Distância</b><br>
-   ${nm.toFixed(1)} NM (${(nm*1.852).toFixed(0)} km)<br>
-   Tempo de voo: ${fmtHora(tempo)}<br>
-   Consumo: ${gasto.toFixed(1)} L | ${(gasto*D).toFixed(1)} kg | ${((gasto*D)*2.20462).toFixed(1)} lb<br>
-   `;
+   let remanescenteLitros=fuel>0 ? combustivelLitros-gastoLitros : null;
+   let remanescenteSeguro=fuel>0 ? Math.max(remanescenteLitros,0) : null;
+   let remanescenteFmt=fuel>0 ? formatarCombustivel(remanescenteSeguro,a.unit) : null;
 
-   if(fuel>0){
-      let rem=l-gasto;
-      html+=`Combustível remanescente: ${Math.max(rem,0).toFixed(1)} L | ${(Math.max(rem,0)*D).toFixed(1)} kg | ${((Math.max(rem,0)*D)*2.20462).toFixed(1)} lb<br>`;
-      html+= rem>=0 ? "🟢 MISSÃO VIÁVEL<hr>" : "🔴 COMBUSTÍVEL INSUFICIENTE<hr>";
-   }
+   sections.push(`
+     <section class="result-section">
+       <h3 class="result-section-title">Missão por distância</h3>
+       <div class="result-cards">
+         <article class="result-card">
+           <span class="result-card-label">Tempo de voo</span>
+           <span class="result-card-value">${fmtHora(tempo)}</span>
+         </article>
+         <article class="result-card">
+           <span class="result-card-label">Distância</span>
+           <span class="result-card-value">${nm.toFixed(1)} NM</span>
+           <span class="result-card-detail">${(nm*1.852).toFixed(0)} km</span>
+         </article>
+         <article class="result-card">
+           <span class="result-card-label">Consumo previsto</span>
+           <span class="result-card-value">${gastoFmt.principal}</span>
+           <span class="result-card-detail">${gastoFmt.equivalentes}</span>
+         </article>
+         <article class="result-card">
+           <span class="result-card-label">Remanescente</span>
+           <span class="result-card-value">${fuel>0 ? remanescenteFmt.principal : "Não calculado"}</span>
+           <span class="result-card-detail">${fuel>0 ? remanescenteFmt.equivalentes : "Informe o combustível no tanque"}</span>
+         </article>
+         <article class="result-card wide">
+           <span class="result-card-label">Situação da missão</span>
+           <span class="result-card-value mission-state ${fuel>0 ? (remanescenteLitros>=0 ? "state-ok" : "state-danger") : "state-neutral"}">
+             ${fuel>0 ? (remanescenteLitros>=0 ? "MISSÃO VIÁVEL" : "COMBUSTÍVEL INSUFICIENTE") : "AGUARDANDO COMBUSTÍVEL"}
+           </span>
+         </article>
+       </div>
+       ${fuel>0 ? criarBarraCombustivel(capacidadeLitros,combustivelLitros,gastoLitros) : ""}
+     </section>
+   `);
  }
 
  let min=parseFloat(document.getElementById("tempo").value||0);
  if(min>0){
-   let h=min/60;
-   let dnm=h*velocidade;
-   let gasto=h*consumo;
+   let horas=min/60;
+   let distanciaNm=horas*velocidade;
+   let gastoLitros=horas*consumoLitrosHora;
+   let gastoFmt=formatarCombustivel(gastoLitros,a.unit);
 
-   html+=`
-   <b>Missão por Tempo</b><br>
-   Tempo informado: ${fmtHora(h)}<br>
-   Distância: ${dnm.toFixed(1)} NM (${(dnm*1.852).toFixed(0)} km)<br>
-   Consumo: ${gasto.toFixed(1)} L | ${(gasto*D).toFixed(1)} kg | ${((gasto*D)*2.20462).toFixed(1)} lb<br>
-   `;
+   let remanescenteLitros=fuel>0 ? combustivelLitros-gastoLitros : null;
+   let remanescenteSeguro=fuel>0 ? Math.max(remanescenteLitros,0) : null;
+   let remanescenteFmt=fuel>0 ? formatarCombustivel(remanescenteSeguro,a.unit) : null;
 
-   if(fuel>0){
-      let rem=l-gasto;
-      html+=`Combustível remanescente: ${Math.max(rem,0).toFixed(1)} L | ${(Math.max(rem,0)*D).toFixed(1)} kg | ${((Math.max(rem,0)*D)*2.20462).toFixed(1)} lb<br>`;
-      html+= rem>=0 ? "🟢 MISSÃO VIÁVEL" : "🔴 COMBUSTÍVEL INSUFICIENTE";
-   }
+   sections.push(`
+     <section class="result-section">
+       <h3 class="result-section-title">Missão por tempo</h3>
+       <div class="result-cards">
+         <article class="result-card">
+           <span class="result-card-label">Tempo informado</span>
+           <span class="result-card-value">${fmtHora(horas)}</span>
+         </article>
+         <article class="result-card">
+           <span class="result-card-label">Distância estimada</span>
+           <span class="result-card-value">${distanciaNm.toFixed(1)} NM</span>
+           <span class="result-card-detail">${(distanciaNm*1.852).toFixed(0)} km</span>
+         </article>
+         <article class="result-card">
+           <span class="result-card-label">Consumo previsto</span>
+           <span class="result-card-value">${gastoFmt.principal}</span>
+           <span class="result-card-detail">${gastoFmt.equivalentes}</span>
+         </article>
+         <article class="result-card">
+           <span class="result-card-label">Remanescente</span>
+           <span class="result-card-value">${fuel>0 ? remanescenteFmt.principal : "Não calculado"}</span>
+           <span class="result-card-detail">${fuel>0 ? remanescenteFmt.equivalentes : "Informe o combustível no tanque"}</span>
+         </article>
+         <article class="result-card wide">
+           <span class="result-card-label">Situação da missão</span>
+           <span class="result-card-value mission-state ${fuel>0 ? (remanescenteLitros>=0 ? "state-ok" : "state-danger") : "state-neutral"}">
+             ${fuel>0 ? (remanescenteLitros>=0 ? "MISSÃO VIÁVEL" : "COMBUSTÍVEL INSUFICIENTE") : "AGUARDANDO COMBUSTÍVEL"}
+           </span>
+         </article>
+       </div>
+       ${fuel>0 ? criarBarraCombustivel(capacidadeLitros,combustivelLitros,gastoLitros) : ""}
+     </section>
+   `);
  }
 
- out.innerHTML=html;
-
+ out.innerHTML=sections.join("");
 }
+
 function limpar(){
-
-    document.getElementById("fuel").value = "";
-    document.getElementById("dist").value = "";
-    document.getElementById("tempo").value = "";
-
-    document.getElementById("out").innerHTML = "";
-
+ document.getElementById("fuel").value="";
+ document.getElementById("dist").value="";
+ document.getElementById("tempo").value="";
+ document.getElementById("out").innerHTML="";
+ carregar();
 }
- 
+
 carregar();
 </script>
-<!-- Aviso Operacional -->
-<div style="
-    margin-top:25px;
-    padding:15px;
-    border-radius:12px;
-    background:rgba(255,255,255,0.03);
-    border:1px solid rgba(255,255,255,0.06);
-    text-align:center;
-    line-height:1.6;
-    font-size:12px;
-    color:#A9B4C2;
-">
-
-    <p>
-        <strong>Fonte dos dados:</strong>
-        Referências públicas de fabricantes, manuais de voo, documentação técnica
-        e parâmetros operacionais utilizados para planejamento de missões em helicópteros.
-    </p>
-
-    <p>
-        Esta calculadora possui finalidade exclusivamente educacional, de treinamento
-        e apoio ao planejamento operacional, não substituindo os manuais oficiais da aeronave,
-        publicações técnicas, procedimentos operacionais ou o julgamento do piloto em comando.
-    </p>
-
-    <p>
-        Os resultados apresentados constituem estimativas calculadas a partir dos dados
-        informados pelo usuário e podem variar em função de fatores como peso bruto da aeronave,
-        altitude, temperatura ambiente, vento, perfil de missão, configuração operacional,
-        estado dos motores, carga transportada e limitações específicas de cada modelo de helicóptero.
-    </p>
-
-    <p>
-        Em operações reais, devem prevalecer as informações constantes na documentação oficial
-        da aeronave e nas normas operacionais vigentes.
-    </p>
-
-</div>
-
-<footer style="
-    text-align:center;
-    margin-top:10px;
-    padding:8px;
-    font-size:11px;
-    color:#8B98A9;
-">
-    Calculadora de Combustível para Helicópteros • Versão 5.0
-</footer>
- 
 </body>
 </html>
