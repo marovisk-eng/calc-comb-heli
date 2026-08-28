@@ -3,25 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#08111b">
+<meta name="theme-color" content="#111820">
 <title>Calculadora de Combustível para Helicópteros — V6.4</title>
 
 <style>
 :root{
-  --bg:#08111b;
-  --panel:#0f1c2a;
-  --panel-2:#132436;
-  --panel-3:#172c41;
-  --line:#294158;
-  --text:#edf5fc;
-  --muted:#9fb1c1;
-  --accent:#55c7ff;
-  --accent-2:#8bdcff;
-  --success:#43d17b;
-  --warning:#ffbf4d;
-  --danger:#ff6666;
-  --shadow:0 16px 40px rgba(0,0,0,.28);
-  --radius:18px;
+  --bg:#111820;
+  --panel:#18222C;
+  --panel-2:#1D2934;
+  --panel-3:#22303C;
+  --line:#364653;
+  --text:#F1F4F6;
+  --muted:#9DAAB4;
+  --accent:#58AFCF;
+  --accent-2:#7BC4DF;
+  --success:#53C67A;
+  --warning:#E2B45B;
+  --danger:#DE6969;
+  --shadow:0 12px 28px rgba(0,0,0,.22);
+  --radius:16px;
 }
 
 *{box-sizing:border-box}
@@ -32,9 +32,7 @@ body{
   min-height:100vh;
   font-family:Inter,Segoe UI,Arial,sans-serif;
   color:var(--text);
-  background:
-    radial-gradient(circle at 15% -10%,rgba(85,199,255,.13),transparent 34%),
-    linear-gradient(180deg,#08111b 0%,#0a1521 48%,#08111b 100%);
+  background:#111820;
 }
 
 button,input,select{font:inherit}
@@ -43,19 +41,12 @@ button{border:0}
 .app-header{
   position:relative;
   overflow:hidden;
-  border-bottom:1px solid rgba(139,220,255,.16);
-  background:linear-gradient(135deg,rgba(16,34,50,.98),rgba(8,17,27,.98));
+  border-bottom:1px solid #2D3B46;
+  background:#161F28;
 }
 
 .app-header::after{
-  content:"";
-  position:absolute;
-  inset:auto -15% -85px auto;
-  width:330px;
-  height:190px;
-  border:1px solid rgba(85,199,255,.14);
-  border-radius:50%;
-  transform:rotate(-12deg);
+  display:none;
 }
 
 .header-inner{
@@ -123,8 +114,8 @@ h1{
   min-height:92px;
   padding:15px 17px;
   border:1px solid var(--line);
-  border-radius:16px;
-  background:linear-gradient(145deg,rgba(19,36,54,.95),rgba(12,25,38,.95));
+  border-radius:14px;
+  background:#18232D;
   box-shadow:var(--shadow);
 }
 
@@ -182,7 +173,7 @@ h1{
 .panel{
   border:1px solid var(--line);
   border-radius:var(--radius);
-  background:linear-gradient(160deg,rgba(16,31,46,.98),rgba(10,23,35,.98));
+  background:#17222C;
   box-shadow:var(--shadow);
   overflow:hidden;
 }
@@ -259,11 +250,11 @@ input,select{
   width:100%;
   min-height:46px;
   padding:11px 13px;
-  border:1px solid #355169;
+  border:1px solid #3A4C59;
   border-radius:11px;
   outline:none;
   color:var(--text);
-  background:#0a1723;
+  background:#101820;
   transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease;
 }
 
@@ -297,8 +288,8 @@ select{
   padding:12px 14px;
   border-left:3px solid var(--accent);
   border-radius:9px;
-  color:#c9d9e7;
-  background:rgba(85,199,255,.07);
+  color:#D0DAE1;
+  background:#162733;
   font-size:.86rem;
   line-height:1.55;
 }
@@ -349,7 +340,7 @@ select{
 .btn-secondary{
   color:#d8e6f0;
   border:1px solid #3a566d;
-  background:#132438;
+  background:#1B2833;
 }
 
 .results-panel{
@@ -366,7 +357,7 @@ select{
   border:1px dashed rgba(159,177,193,.22);
   border-radius:14px;
   color:var(--muted);
-  background:rgba(8,17,27,.44);
+  background:#121C25;
 }
 
 .placeholder-mark{
@@ -397,7 +388,7 @@ select{
   padding:14px;
   border:1px solid rgba(159,177,193,.16);
   border-radius:14px;
-  background:rgba(8,17,27,.42);
+  background:#121C25;
 }
 
 .result-section-title{
@@ -418,9 +409,9 @@ select{
 .result-card{
   min-width:0;
   padding:13px;
-  border:1px solid #2b455c;
+  border:1px solid #334754;
   border-radius:12px;
-  background:linear-gradient(145deg,#13263a,#0d1c2b);
+  background:#15222C;
 }
 
 .result-card.wide{grid-column:1 / -1}
@@ -483,7 +474,7 @@ select{
   padding:15px;
   border:1px solid rgba(85,199,255,.2);
   border-radius:14px;
-  background:rgba(8,17,27,.58);
+  background:#101922;
 }
 
 .fuel-visual-head{
