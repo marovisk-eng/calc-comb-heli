@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#08111b">
-<title>Calculadora de Combustível para Helicópteros — V6.3</title>
+<title>Calculadora de Combustível para Helicópteros — V6.4</title>
 
 <style>
 :root{
@@ -25,7 +25,6 @@
 }
 
 *{box-sizing:border-box}
-
 html{scroll-behavior:smooth}
 
 body{
@@ -39,7 +38,6 @@ body{
 }
 
 button,input,select{font:inherit}
-
 button{border:0}
 
 .app-header{
@@ -170,6 +168,10 @@ h1{
   box-shadow:0 0 14px currentColor;
 }
 
+.parameter-status.custom{
+  color:var(--warning);
+}
+
 .dashboard{
   display:grid;
   grid-template-columns:minmax(0,1.12fr) minmax(330px,.88fr);
@@ -242,13 +244,8 @@ h1{
   gap:14px;
 }
 
-.field{
-  min-width:0;
-}
-
-.field.full{
-  grid-column:1 / -1;
-}
+.field{min-width:0}
+.field.full{grid-column:1 / -1}
 
 label{
   display:block;
@@ -256,10 +253,6 @@ label{
   color:#dce8f2;
   font-size:.8rem;
   font-weight:800;
-}
-
-.input-shell{
-  position:relative;
 }
 
 input,select{
@@ -274,13 +267,17 @@ input,select{
   transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease;
 }
 
-input:hover,select:hover{
-  border-color:#466a87;
-}
+input:hover,select:hover{border-color:#466a87}
 
 input:focus,select:focus{
   border-color:var(--accent);
   box-shadow:0 0 0 3px rgba(85,199,255,.12);
+}
+
+input[readonly]{
+  color:#c7d7e5;
+  background:#0c1925;
+  opacity:.92;
 }
 
 select{
@@ -304,6 +301,13 @@ select{
   background:rgba(85,199,255,.07);
   font-size:.86rem;
   line-height:1.55;
+}
+
+.capacity-note{
+  margin-top:7px;
+  color:var(--muted);
+  font-size:.72rem;
+  line-height:1.45;
 }
 
 .separator{
@@ -384,53 +388,95 @@ select{
   line-height:1.75;
 }
 
-.result:empty{
-  display:none;
-}
-
-.result:not(:empty) + .result-placeholder{
-  display:none;
-}
-
-.result b{
-  color:#fff;
-  font-size:.92rem;
-}
-
-.result hr{
-  border:0;
-  height:1px;
-  margin:14px 0;
-  background:rgba(159,177,193,.17);
-}
-
+.result:empty{display:none}
+.result:not(:empty) + .result-placeholder{display:none}
 
 .result-dashboard{display:grid;gap:14px}
-.result-section{padding:14px;border:1px solid rgba(159,177,193,.16);border-radius:14px;background:rgba(8,17,27,.42)}
-.result-section-title{margin:0 0 11px;color:var(--accent-2);font-size:.75rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase}
-.result-cards,.result-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.result-card{min-width:0;padding:13px;border:1px solid #2b455c;border-radius:12px;background:linear-gradient(145deg,#13263a,#0d1c2b)}
+
+.result-section{
+  padding:14px;
+  border:1px solid rgba(159,177,193,.16);
+  border-radius:14px;
+  background:rgba(8,17,27,.42);
+}
+
+.result-section-title{
+  margin:0 0 11px;
+  color:var(--accent-2);
+  font-size:.75rem;
+  font-weight:900;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+}
+
+.result-cards,.result-summary{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.result-card{
+  min-width:0;
+  padding:13px;
+  border:1px solid #2b455c;
+  border-radius:12px;
+  background:linear-gradient(145deg,#13263a,#0d1c2b);
+}
+
 .result-card.wide{grid-column:1 / -1}
-.result-card-label{display:block;margin-bottom:7px;color:var(--muted);font-size:.68rem;font-weight:900;letter-spacing:.11em;text-transform:uppercase}
-.result-card-value{display:block;overflow-wrap:anywhere;color:#fff;font-size:clamp(1.03rem,2.4vw,1.35rem);font-weight:900;line-height:1.18}
-.result-card-detail{display:block;margin-top:6px;color:#aebfce;font-size:.74rem;line-height:1.45}
-.mission-state{display:flex;align-items:center;gap:9px}
-.mission-state::before{content:"";flex:0 0 auto;width:10px;height:10px;border-radius:50%;background:currentColor;box-shadow:0 0 14px currentColor}
+
+.result-card-label{
+  display:block;
+  margin-bottom:7px;
+  color:var(--muted);
+  font-size:.68rem;
+  font-weight:900;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+}
+
+.result-card-value{
+  display:block;
+  overflow-wrap:anywhere;
+  color:#fff;
+  font-size:clamp(1.03rem,2.4vw,1.35rem);
+  font-weight:900;
+  line-height:1.18;
+  font-variant-numeric:tabular-nums;
+}
+
+.result-card-value.emphasis{
+  color:var(--accent-2);
+  font-size:clamp(1.18rem,2.7vw,1.55rem);
+}
+
+.result-card-detail{
+  display:block;
+  margin-top:6px;
+  color:#aebfce;
+  font-size:.74rem;
+  line-height:1.45;
+}
+
+.mission-state{
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+
+.mission-state::before{
+  content:"";
+  flex:0 0 auto;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:currentColor;
+  box-shadow:0 0 14px currentColor;
+}
+
 .state-ok{color:var(--success)}
 .state-danger{color:var(--danger)}
 .state-neutral{color:var(--muted)}
-@media (max-width:480px){
-  .result-cards,.result-summary{grid-template-columns:1fr}
-  .result-card.wide{grid-column:auto}
-}
-
-
-.capacity-note{
-  margin-top:7px;
-  color:var(--muted);
-  font-size:.72rem;
-  line-height:1.4;
-}
 
 .fuel-visual{
   margin-top:14px;
@@ -460,6 +506,7 @@ select{
   color:var(--accent-2);
   font-size:1.35rem;
   font-weight:900;
+  font-variant-numeric:tabular-nums;
 }
 
 .fuel-track{
@@ -478,21 +525,11 @@ select{
   transition:width .35s ease;
 }
 
-.fuel-consumed{
-  background:var(--warning);
-}
-
-.fuel-remaining{
-  background:var(--success);
-}
-
-.fuel-empty{
-  background:rgba(159,177,193,.16);
-}
-
-.fuel-overflow{
-  background:var(--danger);
-}
+.fuel-consumed{background:var(--warning)}
+.fuel-remaining{background:var(--success)}
+.fuel-current{background:linear-gradient(90deg,#4db7df,#76d8ff)}
+.fuel-empty{background:rgba(159,177,193,.16)}
+.fuel-overflow{background:var(--danger)}
 
 .fuel-legend{
   display:grid;
@@ -521,6 +558,7 @@ select{
 
 .legend-consumed{color:var(--warning)}
 .legend-remaining{color:var(--success)}
+.legend-current{color:var(--accent-2)}
 .legend-empty{color:#8295a6}
 .legend-danger{color:var(--danger)}
 
@@ -535,8 +573,37 @@ select{
   line-height:1.45;
 }
 
-@media (max-width:600px){
-  .fuel-legend{grid-template-columns:1fr}
+.refill-box{
+  margin-top:12px;
+  padding:13px;
+  border:1px solid rgba(85,199,255,.26);
+  border-radius:12px;
+  background:linear-gradient(145deg,rgba(85,199,255,.095),rgba(8,17,27,.44));
+}
+
+.refill-label{
+  display:block;
+  margin-bottom:6px;
+  color:var(--muted);
+  font-size:.68rem;
+  font-weight:900;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+}
+
+.refill-main{
+  display:block;
+  color:#fff;
+  font-size:1.45rem;
+  font-weight:900;
+  font-variant-numeric:tabular-nums;
+}
+
+.refill-equivalent{
+  display:block;
+  margin-top:5px;
+  color:#b9cad8;
+  font-size:.78rem;
 }
 
 .footer-note{
@@ -550,11 +617,16 @@ select{
   line-height:1.55;
 }
 
-.footer-note strong{
-  color:#ffe0a3;
+.footer-note strong{color:#ffe0a3}
+
+.footer-source{
+  margin-top:12px;
+  color:#8295a6;
+  font-size:.69rem;
+  line-height:1.55;
 }
 
-@media (max-width:900px){
+@media(max-width:900px){
   .header-inner{align-items:flex-start}
   .dashboard{grid-template-columns:1fr}
   .results-panel{position:static}
@@ -562,25 +634,25 @@ select{
   .mission-strip .status-cell:first-child{grid-column:1 / -1}
 }
 
-@media (max-width:600px){
+@media(max-width:600px){
   .header-inner{
     flex-direction:column;
     padding-top:22px;
   }
 
   .container{padding:16px 12px 28px}
-
   .mission-strip{grid-template-columns:1fr}
-
   .mission-strip .status-cell:first-child{grid-column:auto}
-
   .form-grid{grid-template-columns:1fr}
-
   .field.full{grid-column:auto}
-
   .action-bar{grid-template-columns:1fr}
-
   .panel-header,.panel-body{padding-left:15px;padding-right:15px}
+  .fuel-legend{grid-template-columns:1fr}
+}
+
+@media(max-width:480px){
+  .result-cards,.result-summary{grid-template-columns:1fr}
+  .result-card.wide{grid-column:auto}
 }
 </style>
 </head>
@@ -593,11 +665,12 @@ select{
       <h1>Calculadora de Combustível para Helicópteros</h1>
       <p class="header-subtitle">Painel Operacional de Planejamento de Missão</p>
     </div>
-    <div class="version-chip">V6.3 Operacional</div>
+    <div class="version-chip">V6.4 Operacional</div>
   </div>
 </header>
 
 <main class="container">
+
   <section class="mission-strip" aria-label="Resumo operacional">
     <article class="status-cell">
       <span class="status-label">Aeronave selecionada</span>
@@ -611,7 +684,7 @@ select{
 
     <article class="status-cell">
       <span class="status-label">Parâmetros da aeronave</span>
-      <span class="parameter-status">Padrão</span>
+      <span id="parameterStatus" class="parameter-status">Padrão</span>
     </article>
   </section>
 
@@ -638,12 +711,12 @@ select{
 
           <div class="field">
             <label for="vel">Velocidade de cruzeiro (kt)</label>
-            <input id="vel" type="number" inputmode="decimal">
+            <input id="vel" type="number" inputmode="decimal" min="1" step="1">
           </div>
 
           <div class="field">
             <label id="consLabel" for="cons">Consumo</label>
-            <input id="cons" type="number" inputmode="decimal">
+            <input id="cons" type="number" inputmode="decimal" min="0.1" step="0.1">
           </div>
         </div>
 
@@ -656,15 +729,15 @@ select{
         <div class="form-grid">
           <div class="field">
             <label for="fuel">Combustível no tanque</label>
-            <input id="fuel" type="number" inputmode="decimal">
+            <input id="fuel" type="number" inputmode="decimal" min="0" step="0.1">
           </div>
 
           <div class="field">
             <label for="unit">Unidade</label>
             <select id="unit">
-              <option>KG</option>
-              <option>L</option>
-              <option>LB</option>
+              <option value="KG">KG</option>
+              <option value="L">LITROS</option>
+              <option value="LB">LB</option>
             </select>
           </div>
 
@@ -681,20 +754,20 @@ select{
 
           <div class="field">
             <label for="dist">Distância da missão</label>
-            <input id="dist" type="number" inputmode="decimal">
+            <input id="dist" type="number" inputmode="decimal" min="0" step="0.1">
           </div>
 
           <div class="field">
             <label for="distUnit">Unidade da distância</label>
             <select id="distUnit">
-              <option>NM</option>
-              <option>KM</option>
+              <option value="NM">NM</option>
+              <option value="KM">KM</option>
             </select>
           </div>
 
           <div class="field full">
             <label for="tempo">Tempo da missão (min)</label>
-            <input id="tempo" type="number" inputmode="decimal">
+            <input id="tempo" type="number" inputmode="decimal" min="0" step="1">
           </div>
         </div>
 
@@ -732,452 +805,674 @@ select{
 
   <div class="footer-note">
     <strong>Aviso operacional:</strong>
-    esta calculadora é uma ferramenta de apoio ao planejamento. Confirme os dados da aeronave,
-    reservas, condições meteorológicas, limitações operacionais e procedimentos aplicáveis antes do voo.
+    esta calculadora é uma ferramenta de apoio educacional, treinamento e planejamento.
+    Os resultados são estimativas e podem variar em função de peso bruto, altitude, temperatura,
+    vento, perfil de missão, configuração operacional, estado dos motores, carga transportada
+    e limitações específicas. Em operação real, prevalecem o RFM/POH, documentação oficial,
+    procedimentos do operador e julgamento do piloto em comando.
+
+    <div class="footer-source">
+      Capacidades, configurações e densidades cadastradas são referências para cálculo.
+      Confirme a configuração real da aeronave, modificações e tanques auxiliares antes de usar
+      a indicação “quanto falta para completar”.
+    </div>
   </div>
+
 </main>
 
 <script>
-const D=0.805;
-const DB={
-"AW119":{
-  vel:130,cons:180,unit:"KG",
-  tanks:[
-    {name:"Padrão",capacity:595,unit:"L",note:"Capacidade utilizável de referência; confirme a configuração da aeronave."},
-    {name:"Personalizada",capacity:595,unit:"L",custom:true,note:"Edite a capacidade conforme a configuração real."}
-  ]
-},
-"AS350 B2":{
-  vel:125,cons:180,unit:"L",
-  tanks:[
-    {name:"Padrão",capacity:540,unit:"L",note:"Capacidade nominal de referência."},
-    {name:"Personalizada",capacity:540,unit:"L",custom:true,note:"Edite conforme tanque e modificação instalada."}
-  ]
-},
-"AS350 B3":{
-  vel:130,cons:190,unit:"L",
-  tanks:[
-    {name:"Padrão",capacity:540,unit:"L",note:"Capacidade nominal de referência."},
-    {name:"Personalizada",capacity:540,unit:"L",custom:true,note:"Edite conforme tanque e modificação instalada."}
-  ]
-},
-"H125":{
-  vel:130,cons:190,unit:"L",
-  tanks:[
-    {name:"Padrão",capacity:425,unit:"KG",note:"Capacidade padrão de referência informada em massa."},
-    {name:"Personalizada",capacity:425,unit:"KG",custom:true,note:"Edite conforme a configuração real."}
-  ]
-},
-"H145":{
-  vel:140,cons:280,unit:"KG",
-  tanks:[
-    {name:"Padrão civil",capacity:723,unit:"KG",note:"Capacidade padrão de referência; versões e opções podem variar."},
-    {name:"Personalizada",capacity:723,unit:"KG",custom:true,note:"Edite conforme a configuração real."}
-  ]
-},
-"Bell 412":{
-  vel:135,cons:420,unit:"LB",
-  tanks:[
-    {name:"Padrão",capacity:1251,unit:"L",note:"Tanque padrão."},
-    {name:"Padrão + auxiliar 123 L",capacity:1374,unit:"L",note:"Inclui tanque auxiliar pequeno."},
-    {name:"Padrão + auxiliar 617 L",capacity:1868,unit:"L",note:"Inclui tanque auxiliar grande."},
-    {name:"Personalizada",capacity:1251,unit:"L",custom:true,note:"Edite conforme a configuração real."}
-  ]
-},
-"Bell 429":{
-  vel:150,cons:300,unit:"LB",
-  tanks:[
-    {name:"Padrão",capacity:821,unit:"L",note:"Capacidade padrão de referência."},
-    {name:"Padrão + auxiliar 148 L",capacity:969,unit:"L",note:"Inclui tanque auxiliar opcional."},
-    {name:"Personalizada",capacity:821,unit:"L",custom:true,note:"Edite conforme a configuração real."}
-  ]
-},
-"AW139":{
-  vel:165,cons:400,unit:"KG",
-  tanks:[
-    {name:"Padrão utilizável",capacity:1568,unit:"L",note:"Capacidade utilizável de referência; tanques auxiliares podem alterar o total."},
-    {name:"Personalizada",capacity:1568,unit:"L",custom:true,note:"Edite conforme a configuração real."}
-  ]
-},
-"R44":{
-  vel:110,cons:60,unit:"L",
-  tanks:[
-    {name:"Tanque principal",capacity:111.7,unit:"L",note:"Somente tanque principal."},
-    {name:"Principal + auxiliar",capacity:176.1,unit:"L",note:"Inclui tanque auxiliar de aproximadamente 64,4 L."},
-    {name:"Personalizada",capacity:176.1,unit:"L",custom:true,note:"Edite conforme a configuração real."}
-  ]
-},
-"R66":{
-  vel:120,cons:95,unit:"L",
-  tanks:[
-    {name:"Padrão",capacity:278.6,unit:"L",note:"Capacidade padrão de referência."},
-    {name:"Padrão + auxiliar 88 L",capacity:366.6,unit:"L",note:"Inclui tanque auxiliar Slimline."},
-    {name:"Padrão + auxiliar 165 L",capacity:443.6,unit:"L",note:"Inclui tanque auxiliar grande."},
-    {name:"Personalizada",capacity:278.6,unit:"L",custom:true,note:"Edite conforme a configuração real."}
-  ]
-}
+const LB_PER_KG = 2.2046226218;
+const NM_TO_KM = 1.852;
+
+/*
+  Densidade = referência de conversão por modelo/tipo de combustível.
+  Não substitui densidade real medida no abastecimento.
+*/
+const DB = {
+  "AW119":{
+    vel:130, cons:180, unit:"KG", density:0.800, fuelType:"Jet A / Jet A-1",
+    source:"Capacidade utilizável de referência: 595 L.",
+    tanks:[
+      {name:"Padrão",capacity:595,unit:"L",note:"Capacidade utilizável de referência; confirme a configuração da aeronave."},
+      {name:"Personalizada",capacity:595,unit:"L",custom:true,note:"Edite a capacidade conforme a configuração real."}
+    ]
+  },
+
+  "AS350 B2":{
+    vel:125, cons:180, unit:"L", density:0.790, fuelType:"Jet A / Jet A-1",
+    source:"Família AS350; capacidade de referência da configuração padrão.",
+    tanks:[
+      {name:"Padrão",capacity:540,unit:"L",note:"Capacidade nominal de referência."},
+      {name:"Personalizada",capacity:540,unit:"L",custom:true,note:"Edite conforme tanque e modificação instalada."}
+    ]
+  },
+
+  "AS350 B3":{
+    vel:130, cons:190, unit:"L", density:0.790, fuelType:"Jet A / Jet A-1",
+    source:"Família AS350; capacidade de referência da configuração padrão.",
+    tanks:[
+      {name:"Padrão",capacity:540,unit:"L",note:"Capacidade nominal de referência."},
+      {name:"Personalizada",capacity:540,unit:"L",custom:true,note:"Edite conforme tanque e modificação instalada."}
+    ]
+  },
+
+  "H125":{
+    vel:130, cons:190, unit:"L", density:0.790, fuelType:"Jet A / Jet A-1",
+    source:"Capacidade padrão de referência informada em massa.",
+    tanks:[
+      {name:"Padrão",capacity:425,unit:"KG",note:"Capacidade padrão de referência informada em massa."},
+      {name:"Personalizada",capacity:425,unit:"KG",custom:true,note:"Edite conforme a configuração real."}
+    ]
+  },
+
+  "H145":{
+    vel:140, cons:280, unit:"KG", density:0.800, fuelType:"Jet A / Jet A-1",
+    source:"Capacidade padrão de referência; versões e opções podem variar.",
+    tanks:[
+      {name:"Padrão civil",capacity:723,unit:"KG",note:"Capacidade padrão de referência; versões e opções podem variar."},
+      {name:"Personalizada",capacity:723,unit:"KG",custom:true,note:"Edite conforme a configuração real."}
+    ]
+  },
+
+  "Bell 412":{
+    vel:135, cons:420, unit:"LB", density:0.800, fuelType:"Aviation Turbine Fuel",
+    source:"Configurações padrão e auxiliares de referência.",
+    tanks:[
+      {name:"Padrão",capacity:1251,unit:"L",note:"Tanque padrão."},
+      {name:"Padrão + auxiliar 123 L",capacity:1374,unit:"L",note:"Inclui tanque auxiliar pequeno."},
+      {name:"Padrão + auxiliar 617 L",capacity:1868,unit:"L",note:"Inclui tanque auxiliar grande."},
+      {name:"Personalizada",capacity:1251,unit:"L",custom:true,note:"Edite conforme a configuração real."}
+    ]
+  },
+
+  "Bell 429":{
+    vel:150, cons:300, unit:"LB", density:0.800, fuelType:"Aviation Turbine Fuel",
+    source:"Configuração padrão e tanque auxiliar opcional de referência.",
+    tanks:[
+      {name:"Padrão",capacity:821,unit:"L",note:"Capacidade padrão de referência."},
+      {name:"Padrão + auxiliar 148 L",capacity:969,unit:"L",note:"Inclui tanque auxiliar opcional."},
+      {name:"Personalizada",capacity:821,unit:"L",custom:true,note:"Edite conforme a configuração real."}
+    ]
+  },
+
+  "AW139":{
+    vel:165, cons:400, unit:"KG", density:0.800, fuelType:"Jet A / Jet A-1",
+    source:"Capacidade utilizável de referência; tanques auxiliares podem alterar o total.",
+    tanks:[
+      {name:"Padrão utilizável",capacity:1568,unit:"L",note:"Capacidade utilizável de referência; tanques auxiliares podem alterar o total."},
+      {name:"Personalizada",capacity:1568,unit:"L",custom:true,note:"Edite conforme a configuração real."}
+    ]
+  },
+
+  "R44":{
+    vel:110, cons:60, unit:"L", density:0.719, fuelType:"AVGAS",
+    source:"R44 com referências de tanque principal e combinado.",
+    tanks:[
+      {name:"Tanque principal",capacity:111.7,unit:"L",note:"Somente tanque principal."},
+      {name:"Principal + auxiliar",capacity:176.1,unit:"L",note:"Inclui tanque auxiliar de aproximadamente 64,4 L."},
+      {name:"Personalizada",capacity:176.1,unit:"L",custom:true,note:"Edite conforme a configuração real."}
+    ]
+  },
+
+  "R66":{
+    vel:120, cons:95, unit:"L", density:0.804, fuelType:"Aviation Turbine Fuel",
+    source:"Capacidade padrão e tanques auxiliares de referência.",
+    tanks:[
+      {name:"Padrão",capacity:278.6,unit:"L",note:"Capacidade padrão de referência."},
+      {name:"Padrão + auxiliar 88 L",capacity:366.6,unit:"L",note:"Inclui tanque auxiliar de referência."},
+      {name:"Padrão + auxiliar 165 L",capacity:443.6,unit:"L",note:"Inclui tanque auxiliar grande de referência."},
+      {name:"Personalizada",capacity:278.6,unit:"L",custom:true,note:"Edite conforme a configuração real."}
+    ]
+  }
 };
 
-const heli=document.getElementById("heli");
-for(let k in DB){
- let o=document.createElement("option");
- o.value=k;o.textContent=k;
- heli.appendChild(o);
+const heli = document.getElementById("heli");
+const vel = document.getElementById("vel");
+const cons = document.getElementById("cons");
+const unit = document.getElementById("unit");
+const distUnit = document.getElementById("distUnit");
+const tankConfig = document.getElementById("tankConfig");
+const capacity = document.getElementById("capacity");
+const capacityNote = document.getElementById("capacityNote");
+const info = document.getElementById("info");
+const out = document.getElementById("out");
+const parameterStatus = document.getElementById("parameterStatus");
+
+for(const k in DB){
+  const o=document.createElement("option");
+  o.value=k;
+  o.textContent=k;
+  heli.appendChild(o);
+}
+
+function unitText(u){
+  if(u==="KG") return "kg";
+  if(u==="LB") return "lb";
+  return "L";
+}
+
+function fmtHora(h){
+  if(!Number.isFinite(h) || h<0) return "—";
+  let hh=Math.floor(h);
+  let mm=Math.round((h-hh)*60);
+  if(mm===60){hh++;mm=0;}
+  return `${hh}h${String(mm).padStart(2,"0")}min (${h.toFixed(1)})`;
+}
+
+function paraLitros(valor,u,density){
+  if(!Number.isFinite(valor) || valor<=0) return 0;
+  if(u==="L") return valor;
+  if(u==="KG") return valor/density;
+  if(u==="LB") return (valor/LB_PER_KG)/density;
+  return 0;
+}
+
+function deLitros(valorL,u,density){
+  if(!Number.isFinite(valorL) || valorL<=0) return 0;
+  if(u==="L") return valorL;
+  if(u==="KG") return valorL*density;
+  if(u==="LB") return valorL*density*LB_PER_KG;
+  return 0;
+}
+
+function formatarCombustivel(valorL,unidadePrincipal,a){
+  const valores={
+    L:deLitros(valorL,"L",a.density),
+    KG:deLitros(valorL,"KG",a.density),
+    LB:deLitros(valorL,"LB",a.density)
+  };
+
+  const principal=`${valores[unidadePrincipal].toFixed(1)} ${unidadePrincipal}`;
+  const equivalentes=["L","KG","LB"]
+    .filter(u=>u!==unidadePrincipal)
+    .map(u=>`${valores[u].toFixed(1)} ${u}`)
+    .join(" · ");
+
+  return {principal,equivalentes,valores};
+}
+
+function formatarTaxa(valorLHora,unidadePrincipal,a){
+  const taxa=formatarCombustivel(valorLHora,unidadePrincipal,a);
+  return {
+    principal:`${taxa.principal}/h`,
+    equivalentes:taxa.equivalentes
+      .split(" · ")
+      .map(v=>`${v}/h`)
+      .join(" · ")
+  };
 }
 
 function preencherTanques(){
- const a=DB[heli.value];
- tankConfig.innerHTML="";
+  const a=DB[heli.value];
+  tankConfig.innerHTML="";
 
- a.tanks.forEach((tank,index)=>{
-   const option=document.createElement("option");
-   option.value=index;
-   option.textContent=tank.name;
-   tankConfig.appendChild(option);
- });
+  a.tanks.forEach((tank,index)=>{
+    const option=document.createElement("option");
+    option.value=index;
+    option.textContent=tank.name;
+    tankConfig.appendChild(option);
+  });
 
- tankConfig.value="0";
- atualizarCapacidade();
+  tankConfig.value="0";
+  atualizarCapacidade();
 }
 
 function atualizarCapacidade(){
- const a=DB[heli.value];
- const tank=a.tanks[Number(tankConfig.value)||0];
+  const a=DB[heli.value];
+  const tank=a.tanks[Number(tankConfig.value)||0];
 
- capacity.value=Number(tank.capacity.toFixed ? tank.capacity.toFixed(1) : tank.capacity);
- capacity.dataset.unit=tank.unit;
- capacity.readOnly=!tank.custom;
- capacityNote.textContent=`${tank.note} Unidade da capacidade: ${tank.unit}.`;
+  capacity.value=Number(tank.capacity).toFixed(1);
+  capacity.dataset.unit=tank.unit;
+  capacity.readOnly=!tank.custom;
+
+  capacityNote.textContent =
+    `${tank.note} Unidade: ${tank.unit}. ` +
+    `Combustível: ${a.fuelType}. Densidade de referência: ${a.density.toFixed(3)} kg/L.`;
 }
 
 function carregar(){
- let a=DB[heli.value];
- vel.value=a.vel;
- cons.value=a.cons;
- unit.value=a.unit;
+  const a=DB[heli.value];
 
- document.getElementById("aircraftDisplay").textContent=heli.value;
- document.getElementById("unitDisplay").textContent=a.unit;
- document.getElementById("consLabel").textContent=`Consumo (${a.unit}/h)`;
- info.innerHTML=`Velocidade padrão: ${a.vel} kt | Consumo padrão: ${a.cons} ${a.unit}/h`;
+  vel.value=a.vel;
+  cons.value=a.cons;
+  unit.value=a.unit;
 
- preencherTanques();
+  document.getElementById("aircraftDisplay").textContent=heli.value;
+  document.getElementById("unitDisplay").textContent=a.unit;
+  document.getElementById("consLabel").textContent=`Consumo (${a.unit}/h)`;
+
+  info.innerHTML =
+    `Velocidade padrão: <b>${a.vel} kt</b> &nbsp;|&nbsp; ` +
+    `Consumo padrão: <b>${a.cons.toFixed(1)} ${a.unit}/h</b> &nbsp;|&nbsp; ` +
+    `Densidade de referência: <b>${a.density.toFixed(3)} kg/L</b>`;
+
+  preencherTanques();
+  atualizarStatusParametros();
+  out.innerHTML="";
+}
+
+function atualizarStatusParametros(){
+  const a=DB[heli.value];
+  const v=parseFloat(vel.value);
+  const c=parseFloat(cons.value);
+
+  const padrao =
+    Number.isFinite(v) && Number.isFinite(c) &&
+    Math.abs(v-a.vel)<0.0001 &&
+    Math.abs(c-a.cons)<0.0001;
+
+  parameterStatus.textContent=padrao ? "Padrão" : "Personalizado";
+  parameterStatus.classList.toggle("custom",!padrao);
 }
 
 heli.addEventListener("change",carregar);
 tankConfig.addEventListener("change",atualizarCapacidade);
-
-function fmtHora(h){
- let hh=Math.floor(h);
- let mm=Math.round((h-hh)*60);
- return `${hh}h${String(mm).padStart(2,'0')}min (${h.toFixed(1)})`;
-}
-
-// Todos os cálculos internos de combustível são normalizados em litros.
-// D = densidade de referência do QAV, em kg/L.
-function paraLitros(valor,u){
- if(!valor) return 0;
- if(u==="L") return valor;
- if(u==="KG") return valor/D;
- if(u==="LB") return (valor/2.20462)/D;
- return 0;
-}
-
-function deLitros(valorL,u){
- if(!valorL) return 0;
- if(u==="L") return valorL;
- if(u==="KG") return valorL*D;
- if(u==="LB") return valorL*D*2.20462;
- return 0;
-}
-
-function formatarCombustivel(valorL,unidadePrincipal){
- const valores={
-   L:deLitros(valorL,"L"),
-   KG:deLitros(valorL,"KG"),
-   LB:deLitros(valorL,"LB")
- };
-
- const principal=`${valores[unidadePrincipal].toFixed(1)} ${unidadePrincipal}`;
- const equivalentes=Object.keys(valores)
-   .filter(u=>u!==unidadePrincipal)
-   .map(u=>`${valores[u].toFixed(1)} ${u}`)
-   .join(" · ");
-
- return {principal,equivalentes};
-}
-
-function formatarTaxa(valorLHora,unidadePrincipal){
- const taxa=formatarCombustivel(valorLHora,unidadePrincipal);
- return {
-   principal:`${taxa.principal}/h`,
-   equivalentes:taxa.equivalentes
-     .split(" · ")
-     .map(v=>`${v}/h`)
-     .join(" · ")
- };
-}
-
+vel.addEventListener("input",atualizarStatusParametros);
+cons.addEventListener("input",atualizarStatusParametros);
 
 function limitarPercentual(valor){
- return Math.min(Math.max(valor,0),100);
+  return Math.min(Math.max(valor,0),100);
 }
 
-function criarBarraCombustivel(capacidadeL,inicialL,consumidoL){
- if(capacidadeL<=0 || inicialL<=0) return "";
+function criarBarraMissao(capacidadeL,inicialL,consumidoL){
+  if(capacidadeL<=0 || inicialL<=0) return "";
 
- const inicialPct=(inicialL/capacidadeL)*100;
- const consumidoReal=Math.min(Math.max(consumidoL,0),inicialL);
- const remanescenteReal=Math.max(inicialL-consumidoL,0);
+  const inicialPct=(inicialL/capacidadeL)*100;
+  const consumidoReal=Math.min(Math.max(consumidoL,0),inicialL);
+  const remanescenteReal=Math.max(inicialL-consumidoL,0);
 
- const consumidoPct=limitarPercentual((consumidoReal/capacidadeL)*100);
- const remanescentePct=limitarPercentual((remanescenteReal/capacidadeL)*100);
- const vazioPct=limitarPercentual(100-consumidoPct-remanescentePct);
- const excedente=inicialL>capacidadeL;
+  const consumidoPct=limitarPercentual((consumidoReal/capacidadeL)*100);
+  const remanescentePct=limitarPercentual((remanescenteReal/capacidadeL)*100);
+  const vazioPct=limitarPercentual(100-consumidoPct-remanescentePct);
+  const excedente=inicialL>capacidadeL;
 
- const consumedStyle=`width:${excedente ? 0 : consumidoPct.toFixed(2)}%`;
- const remainingStyle=`width:${excedente ? 100 : remanescentePct.toFixed(2)}%`;
- const emptyStyle=`width:${excedente ? 0 : vazioPct.toFixed(2)}%`;
+  return `
+    <div class="fuel-visual">
+      <div class="fuel-visual-head">
+        <div>
+          <h4 class="fuel-visual-title">Representação do combustível na missão</h4>
+          <span class="result-card-detail">Consumo, remanescente e espaço vazio relativos à capacidade selecionada</span>
+        </div>
+        <div class="fuel-percent">${inicialPct.toFixed(1)}%</div>
+      </div>
 
- return `
-   <div class="fuel-visual">
-     <div class="fuel-visual-head">
-       <div>
-         <h4 class="fuel-visual-title">Representação do combustível</h4>
-         <span class="result-card-detail">Percentual relativo à capacidade selecionada</span>
-       </div>
-       <div class="fuel-percent">${inicialPct.toFixed(1)}%</div>
-     </div>
+      <div class="fuel-track">
+        <div class="fuel-segment ${excedente ? "fuel-overflow" : "fuel-consumed"}"
+             style="width:${excedente ? 0 : consumidoPct.toFixed(2)}%"></div>
+        <div class="fuel-segment ${excedente ? "fuel-overflow" : "fuel-remaining"}"
+             style="width:${excedente ? 100 : remanescentePct.toFixed(2)}%"></div>
+        <div class="fuel-segment fuel-empty"
+             style="width:${excedente ? 0 : vazioPct.toFixed(2)}%"></div>
+      </div>
 
-     <div class="fuel-track"
-          role="img"
-          aria-label="Combustível consumido ${consumidoPct.toFixed(1)} por cento, remanescente ${remanescentePct.toFixed(1)} por cento e espaço vazio ${vazioPct.toFixed(1)} por cento">
-       <div class="fuel-segment ${excedente ? "fuel-overflow" : "fuel-consumed"}" style="${consumedStyle}"></div>
-       <div class="fuel-segment ${excedente ? "fuel-overflow" : "fuel-remaining"}" style="${remainingStyle}"></div>
-       <div class="fuel-segment fuel-empty" style="${emptyStyle}"></div>
-     </div>
+      <div class="fuel-legend">
+        <div class="legend-item legend-consumed">
+          <span class="legend-dot"></span>
+          <span>Consumido<br><strong>${consumidoPct.toFixed(1)}%</strong></span>
+        </div>
+        <div class="legend-item legend-remaining">
+          <span class="legend-dot"></span>
+          <span>Remanescente<br><strong>${remanescentePct.toFixed(1)}%</strong></span>
+        </div>
+        <div class="legend-item legend-empty">
+          <span class="legend-dot"></span>
+          <span>Espaço vazio<br><strong>${vazioPct.toFixed(1)}%</strong></span>
+        </div>
+      </div>
 
-     <div class="fuel-legend">
-       <div class="legend-item legend-consumed">
-         <span class="legend-dot"></span>
-         <span>Consumido<br><strong>${consumidoPct.toFixed(1)}%</strong></span>
-       </div>
-       <div class="legend-item legend-remaining">
-         <span class="legend-dot"></span>
-         <span>Remanescente<br><strong>${remanescentePct.toFixed(1)}%</strong></span>
-       </div>
-       <div class="legend-item legend-empty">
-         <span class="legend-dot"></span>
-         <span>Espaço vazio<br><strong>${vazioPct.toFixed(1)}%</strong></span>
-       </div>
-     </div>
+      ${excedente ? `
+        <div class="fuel-warning">
+          O combustível informado é superior à capacidade selecionada.
+          Revise a quantidade, a unidade ou a configuração do tanque.
+        </div>
+      ` : ""}
+    </div>
+  `;
+}
 
-     ${excedente ? `
-       <div class="fuel-warning">
-         O combustível informado corresponde a ${inicialPct.toFixed(1)}% da capacidade selecionada.
-         Revise a quantidade, a unidade ou a configuração do tanque.
-       </div>
-     ` : ""}
-   </div>
- `;
+function criarSituacaoTanque(a,capacidadeL,combustivelL){
+  if(capacidadeL<=0 || combustivelL<=0) return "";
+
+  const atualFmt=formatarCombustivel(combustivelL,a.unit,a);
+  const capacidadeFmt=formatarCombustivel(capacidadeL,a.unit,a);
+  const pct=(combustivelL/capacidadeL)*100;
+  const faltanteL=capacidadeL-combustivelL;
+  const excedente=faltanteL<0;
+
+  const atualPct=limitarPercentual(pct);
+  const vazioPct=limitarPercentual(100-atualPct);
+
+  let refillHtml="";
+
+  if(!excedente){
+    const faltaFmt=formatarCombustivel(faltanteL,a.unit,a);
+    refillHtml=`
+      <div class="refill-box">
+        <span class="refill-label">Abastecimento para completar</span>
+        <span class="refill-main">${faltanteL.toFixed(1)} L</span>
+        <span class="refill-equivalent">
+          ${faltaFmt.valores.KG.toFixed(1)} KG · ${faltaFmt.valores.LB.toFixed(1)} LB
+        </span>
+      </div>
+    `;
+  }else{
+    const excessoL=Math.abs(faltanteL);
+    const excessoFmt=formatarCombustivel(excessoL,a.unit,a);
+    refillHtml=`
+      <div class="fuel-warning">
+        <strong>Valor informado acima da capacidade selecionada.</strong><br>
+        Excesso calculado: ${excessoL.toFixed(1)} L ·
+        ${excessoFmt.valores.KG.toFixed(1)} KG ·
+        ${excessoFmt.valores.LB.toFixed(1)} LB
+      </div>
+    `;
+  }
+
+  return `
+    <section class="result-section">
+      <h3 class="result-section-title">Situação do tanque</h3>
+
+      <div class="result-cards">
+        <article class="result-card">
+          <span class="result-card-label">Combustível atual</span>
+          <span class="result-card-value">${atualFmt.principal}</span>
+          <span class="result-card-detail">${atualFmt.equivalentes}</span>
+        </article>
+
+        <article class="result-card">
+          <span class="result-card-label">Capacidade selecionada</span>
+          <span class="result-card-value">${capacidadeFmt.principal}</span>
+          <span class="result-card-detail">${capacidadeFmt.equivalentes}</span>
+        </article>
+
+        <article class="result-card">
+          <span class="result-card-label">Nível estimado</span>
+          <span class="result-card-value emphasis">${pct.toFixed(1)}%</span>
+          <span class="result-card-detail">Relativo à capacidade selecionada</span>
+        </article>
+
+        <article class="result-card">
+          <span class="result-card-label">Densidade de referência</span>
+          <span class="result-card-value">${a.density.toFixed(3)} kg/L</span>
+          <span class="result-card-detail">${a.fuelType}</span>
+        </article>
+      </div>
+
+      <div class="fuel-visual">
+        <div class="fuel-visual-head">
+          <div>
+            <h4 class="fuel-visual-title">Nível do tanque</h4>
+            <span class="result-card-detail">Combustível atual e espaço disponível</span>
+          </div>
+          <div class="fuel-percent">${pct.toFixed(1)}%</div>
+        </div>
+
+        <div class="fuel-track">
+          <div class="fuel-segment ${excedente ? "fuel-overflow" : "fuel-current"}"
+               style="width:${excedente ? 100 : atualPct.toFixed(2)}%"></div>
+          <div class="fuel-segment fuel-empty"
+               style="width:${excedente ? 0 : vazioPct.toFixed(2)}%"></div>
+        </div>
+
+        <div class="fuel-legend">
+          <div class="legend-item legend-current">
+            <span class="legend-dot"></span>
+            <span>No tanque<br><strong>${pct.toFixed(1)}%</strong></span>
+          </div>
+          <div class="legend-item legend-empty">
+            <span class="legend-dot"></span>
+            <span>Disponível<br><strong>${excedente ? "0,0" : vazioPct.toFixed(1)}%</strong></span>
+          </div>
+          <div class="legend-item ${excedente ? "legend-danger" : "legend-current"}">
+            <span class="legend-dot"></span>
+            <span>Configuração<br><strong>${a.tanks[Number(tankConfig.value)||0].name}</strong></span>
+          </div>
+        </div>
+
+        ${refillHtml}
+      </div>
+    </section>
+  `;
 }
 
 function calcular(){
- let a=DB[heli.value];
- let velocidade=parseFloat(vel.value||0);
- let consumo=parseFloat(cons.value||0);
+  const a=DB[heli.value];
+  const velocidade=parseFloat(vel.value);
+  const consumo=parseFloat(cons.value);
 
- if(velocidade<=0 || consumo<=0){
-   out.innerHTML=`
-     <section class="result-section">
-       <h3 class="result-section-title">Verificação necessária</h3>
-       <article class="result-card wide">
-         <span class="result-card-label">Parâmetros inválidos</span>
-         <span class="result-card-value mission-state state-danger">
-           INFORME VELOCIDADE E CONSUMO MAIORES QUE ZERO
-         </span>
-       </article>
-     </section>
-   `;
-   return;
- }
+  if(!Number.isFinite(velocidade) || velocidade<=0 ||
+     !Number.isFinite(consumo) || consumo<=0){
+    out.innerHTML=`
+      <section class="result-section">
+        <h3 class="result-section-title">Verificação necessária</h3>
+        <article class="result-card wide">
+          <span class="result-card-label">Parâmetros inválidos</span>
+          <span class="result-card-value mission-state state-danger">
+            INFORME VELOCIDADE E CONSUMO MAIORES QUE ZERO
+          </span>
+        </article>
+      </section>
+    `;
+    return;
+  }
 
- let fuel=parseFloat(document.getElementById("fuel").value||0);
- let capacidade=parseFloat(document.getElementById("capacity").value||0);
- let capacidadeUnidade=capacity.dataset.unit||"L";
+  const fuelRaw=document.getElementById("fuel").value.trim();
+  const fuel=fuelRaw==="" ? 0 : parseFloat(fuelRaw);
 
- // Normalização:
- // - combustível disponível -> litros
- // - capacidade selecionada -> litros
- // - consumo da aeronave -> litros por hora
- let combustivelLitros=paraLitros(fuel,unit.value);
- let capacidadeLitros=paraLitros(capacidade,capacidadeUnidade);
- let consumoLitrosHora=paraLitros(consumo,a.unit);
+  const capacidade=parseFloat(capacity.value);
+  const capacidadeUnidade=capacity.dataset.unit || "L";
 
- let tanqueFmt=formatarCombustivel(combustivelLitros,a.unit);
- let taxaFmt=formatarTaxa(consumoLitrosHora,a.unit);
+  const combustivelLitros=paraLitros(fuel,unit.value,a.density);
+  const capacidadeLitros=paraLitros(capacidade,capacidadeUnidade,a.density);
+  const consumoLitrosHora=paraLitros(consumo,a.unit,a.density);
 
- let sections=[];
+  const tanqueFmt=formatarCombustivel(combustivelLitros,a.unit,a);
+  const taxaFmt=formatarTaxa(consumoLitrosHora,a.unit,a);
 
- sections.push(`
-   <section class="result-section">
-     <h3 class="result-section-title">Dados utilizados</h3>
-     <div class="result-summary">
-       <article class="result-card">
-         <span class="result-card-label">Aeronave</span>
-         <span class="result-card-value">${heli.value}</span>
-       </article>
-       <article class="result-card">
-         <span class="result-card-label">Unidade operacional</span>
-         <span class="result-card-value unit-value">${a.unit}</span>
-       </article>
-       <article class="result-card">
-         <span class="result-card-label">Velocidade</span>
-         <span class="result-card-value">${velocidade} kt</span>
-       </article>
-       <article class="result-card">
-         <span class="result-card-label">Consumo informado</span>
-         <span class="result-card-value">${taxaFmt.principal}</span>
-         <span class="result-card-detail">${taxaFmt.equivalentes}</span>
-       </article>
-       <article class="result-card wide">
-         <span class="result-card-label">Configuração do tanque</span>
-         <span class="result-card-value">${a.tanks[Number(tankConfig.value)||0].name}</span>
-         <span class="result-card-detail">Capacidade: ${capacidade.toFixed(1)} ${capacidadeUnidade}</span>
-       </article>
-     </div>
-   </section>
- `);
+  let sections=[];
 
- if(fuel>0){
-   let autonomia=combustivelLitros/consumoLitrosHora;
-   let alcance=autonomia*velocidade;
+  sections.push(`
+    <section class="result-section">
+      <h3 class="result-section-title">Dados utilizados</h3>
+      <div class="result-summary">
+        <article class="result-card">
+          <span class="result-card-label">Aeronave</span>
+          <span class="result-card-value">${heli.value}</span>
+        </article>
 
-   sections.push(`
-     <section class="result-section">
-       <h3 class="result-section-title">Combustível disponível</h3>
-       <div class="result-cards">
-         <article class="result-card">
-           <span class="result-card-label">Tempo máximo</span>
-           <span class="result-card-value">${fmtHora(autonomia)}</span>
-         </article>
-         <article class="result-card">
-           <span class="result-card-label">Alcance máximo</span>
-           <span class="result-card-value">${alcance.toFixed(1)} NM</span>
-           <span class="result-card-detail">${(alcance*1.852).toFixed(0)} km</span>
-         </article>
-         <article class="result-card wide">
-           <span class="result-card-label">Combustível no tanque</span>
-           <span class="result-card-value">${tanqueFmt.principal}</span>
-           <span class="result-card-detail">${tanqueFmt.equivalentes}</span>
-         </article>
-       </div>
-       ${criarBarraCombustivel(capacidadeLitros,combustivelLitros,0)}
-     </section>
-   `);
- }
+        <article class="result-card">
+          <span class="result-card-label">Unidade operacional</span>
+          <span class="result-card-value unit-value">${a.unit}</span>
+        </article>
 
- let dist=parseFloat(document.getElementById("dist").value||0);
- if(dist>0){
-   let nm=distUnit.value==="KM" ? dist/1.852 : dist;
-   let tempo=nm/velocidade;
-   let gastoLitros=tempo*consumoLitrosHora;
-   let gastoFmt=formatarCombustivel(gastoLitros,a.unit);
+        <article class="result-card">
+          <span class="result-card-label">Velocidade</span>
+          <span class="result-card-value">${velocidade.toFixed(0)} kt</span>
+        </article>
 
-   let remanescenteLitros=fuel>0 ? combustivelLitros-gastoLitros : null;
-   let remanescenteSeguro=fuel>0 ? Math.max(remanescenteLitros,0) : null;
-   let remanescenteFmt=fuel>0 ? formatarCombustivel(remanescenteSeguro,a.unit) : null;
+        <article class="result-card">
+          <span class="result-card-label">Consumo informado</span>
+          <span class="result-card-value">${taxaFmt.principal}</span>
+          <span class="result-card-detail">${taxaFmt.equivalentes}</span>
+        </article>
 
-   sections.push(`
-     <section class="result-section">
-       <h3 class="result-section-title">Missão por distância</h3>
-       <div class="result-cards">
-         <article class="result-card">
-           <span class="result-card-label">Tempo de voo</span>
-           <span class="result-card-value">${fmtHora(tempo)}</span>
-         </article>
-         <article class="result-card">
-           <span class="result-card-label">Distância</span>
-           <span class="result-card-value">${nm.toFixed(1)} NM</span>
-           <span class="result-card-detail">${(nm*1.852).toFixed(0)} km</span>
-         </article>
-         <article class="result-card">
-           <span class="result-card-label">Consumo previsto</span>
-           <span class="result-card-value">${gastoFmt.principal}</span>
-           <span class="result-card-detail">${gastoFmt.equivalentes}</span>
-         </article>
-         <article class="result-card">
-           <span class="result-card-label">Remanescente</span>
-           <span class="result-card-value">${fuel>0 ? remanescenteFmt.principal : "Não calculado"}</span>
-           <span class="result-card-detail">${fuel>0 ? remanescenteFmt.equivalentes : "Informe o combustível no tanque"}</span>
-         </article>
-         <article class="result-card wide">
-           <span class="result-card-label">Situação da missão</span>
-           <span class="result-card-value mission-state ${fuel>0 ? (remanescenteLitros>=0 ? "state-ok" : "state-danger") : "state-neutral"}">
-             ${fuel>0 ? (remanescenteLitros>=0 ? "MISSÃO VIÁVEL" : "COMBUSTÍVEL INSUFICIENTE") : "AGUARDANDO COMBUSTÍVEL"}
-           </span>
-         </article>
-       </div>
-       ${fuel>0 ? criarBarraCombustivel(capacidadeLitros,combustivelLitros,gastoLitros) : ""}
-     </section>
-   `);
- }
+        <article class="result-card wide">
+          <span class="result-card-label">Configuração do tanque</span>
+          <span class="result-card-value">${a.tanks[Number(tankConfig.value)||0].name}</span>
+          <span class="result-card-detail">
+            Capacidade: ${capacidade.toFixed(1)} ${capacidadeUnidade} ·
+            Densidade de referência: ${a.density.toFixed(3)} kg/L
+          </span>
+        </article>
+      </div>
+    </section>
+  `);
 
- let min=parseFloat(document.getElementById("tempo").value||0);
- if(min>0){
-   let horas=min/60;
-   let distanciaNm=horas*velocidade;
-   let gastoLitros=horas*consumoLitrosHora;
-   let gastoFmt=formatarCombustivel(gastoLitros,a.unit);
+  if(fuel>0){
+    const autonomia=combustivelLitros/consumoLitrosHora;
+    const alcance=autonomia*velocidade;
 
-   let remanescenteLitros=fuel>0 ? combustivelLitros-gastoLitros : null;
-   let remanescenteSeguro=fuel>0 ? Math.max(remanescenteLitros,0) : null;
-   let remanescenteFmt=fuel>0 ? formatarCombustivel(remanescenteSeguro,a.unit) : null;
+    sections.push(`
+      <section class="result-section">
+        <h3 class="result-section-title">Combustível disponível</h3>
+        <div class="result-cards">
+          <article class="result-card">
+            <span class="result-card-label">Tempo máximo</span>
+            <span class="result-card-value">${fmtHora(autonomia)}</span>
+          </article>
 
-   sections.push(`
-     <section class="result-section">
-       <h3 class="result-section-title">Missão por tempo</h3>
-       <div class="result-cards">
-         <article class="result-card">
-           <span class="result-card-label">Tempo informado</span>
-           <span class="result-card-value">${fmtHora(horas)}</span>
-         </article>
-         <article class="result-card">
-           <span class="result-card-label">Distância estimada</span>
-           <span class="result-card-value">${distanciaNm.toFixed(1)} NM</span>
-           <span class="result-card-detail">${(distanciaNm*1.852).toFixed(0)} km</span>
-         </article>
-         <article class="result-card">
-           <span class="result-card-label">Consumo previsto</span>
-           <span class="result-card-value">${gastoFmt.principal}</span>
-           <span class="result-card-detail">${gastoFmt.equivalentes}</span>
-         </article>
-         <article class="result-card">
-           <span class="result-card-label">Remanescente</span>
-           <span class="result-card-value">${fuel>0 ? remanescenteFmt.principal : "Não calculado"}</span>
-           <span class="result-card-detail">${fuel>0 ? remanescenteFmt.equivalentes : "Informe o combustível no tanque"}</span>
-         </article>
-         <article class="result-card wide">
-           <span class="result-card-label">Situação da missão</span>
-           <span class="result-card-value mission-state ${fuel>0 ? (remanescenteLitros>=0 ? "state-ok" : "state-danger") : "state-neutral"}">
-             ${fuel>0 ? (remanescenteLitros>=0 ? "MISSÃO VIÁVEL" : "COMBUSTÍVEL INSUFICIENTE") : "AGUARDANDO COMBUSTÍVEL"}
-           </span>
-         </article>
-       </div>
-       ${fuel>0 ? criarBarraCombustivel(capacidadeLitros,combustivelLitros,gastoLitros) : ""}
-     </section>
-   `);
- }
+          <article class="result-card">
+            <span class="result-card-label">Alcance máximo</span>
+            <span class="result-card-value">${alcance.toFixed(1)} NM</span>
+            <span class="result-card-detail">${(alcance*NM_TO_KM).toFixed(0)} km</span>
+          </article>
 
- out.innerHTML=sections.join("");
+          <article class="result-card wide">
+            <span class="result-card-label">Combustível no tanque</span>
+            <span class="result-card-value">${tanqueFmt.principal}</span>
+            <span class="result-card-detail">${tanqueFmt.equivalentes}</span>
+          </article>
+        </div>
+      </section>
+    `);
+
+    sections.push(criarSituacaoTanque(a,capacidadeLitros,combustivelLitros));
+  }
+
+  const dist=parseFloat(document.getElementById("dist").value||0);
+
+  if(dist>0){
+    const nm=distUnit.value==="KM" ? dist/NM_TO_KM : dist;
+    const tempo=nm/velocidade;
+    const gastoLitros=tempo*consumoLitrosHora;
+    const gastoFmt=formatarCombustivel(gastoLitros,a.unit,a);
+
+    const remanescenteLitros=fuel>0 ? combustivelLitros-gastoLitros : null;
+    const remanescenteSeguro=fuel>0 ? Math.max(remanescenteLitros,0) : null;
+    const remanescenteFmt=fuel>0 ? formatarCombustivel(remanescenteSeguro,a.unit,a) : null;
+
+    sections.push(`
+      <section class="result-section">
+        <h3 class="result-section-title">Missão por distância</h3>
+        <div class="result-cards">
+          <article class="result-card">
+            <span class="result-card-label">Tempo de voo</span>
+            <span class="result-card-value">${fmtHora(tempo)}</span>
+          </article>
+
+          <article class="result-card">
+            <span class="result-card-label">Distância</span>
+            <span class="result-card-value">${nm.toFixed(1)} NM</span>
+            <span class="result-card-detail">${(nm*NM_TO_KM).toFixed(0)} km</span>
+          </article>
+
+          <article class="result-card">
+            <span class="result-card-label">Consumo previsto</span>
+            <span class="result-card-value">${gastoFmt.principal}</span>
+            <span class="result-card-detail">${gastoFmt.equivalentes}</span>
+          </article>
+
+          <article class="result-card">
+            <span class="result-card-label">Remanescente</span>
+            <span class="result-card-value">${fuel>0 ? remanescenteFmt.principal : "Não calculado"}</span>
+            <span class="result-card-detail">${fuel>0 ? remanescenteFmt.equivalentes : "Informe o combustível no tanque"}</span>
+          </article>
+
+          <article class="result-card wide">
+            <span class="result-card-label">Situação da missão</span>
+            <span class="result-card-value mission-state ${fuel>0 ? (remanescenteLitros>=0 ? "state-ok" : "state-danger") : "state-neutral"}">
+              ${fuel>0 ? (remanescenteLitros>=0 ? "MISSÃO VIÁVEL" : "COMBUSTÍVEL INSUFICIENTE") : "AGUARDANDO COMBUSTÍVEL"}
+            </span>
+          </article>
+        </div>
+
+        ${fuel>0 ? criarBarraMissao(capacidadeLitros,combustivelLitros,gastoLitros) : ""}
+      </section>
+    `);
+  }
+
+  const min=parseFloat(document.getElementById("tempo").value||0);
+
+  if(min>0){
+    const horas=min/60;
+    const distanciaNm=horas*velocidade;
+    const gastoLitros=horas*consumoLitrosHora;
+    const gastoFmt=formatarCombustivel(gastoLitros,a.unit,a);
+
+    const remanescenteLitros=fuel>0 ? combustivelLitros-gastoLitros : null;
+    const remanescenteSeguro=fuel>0 ? Math.max(remanescenteLitros,0) : null;
+    const remanescenteFmt=fuel>0 ? formatarCombustivel(remanescenteSeguro,a.unit,a) : null;
+
+    sections.push(`
+      <section class="result-section">
+        <h3 class="result-section-title">Missão por tempo</h3>
+        <div class="result-cards">
+          <article class="result-card">
+            <span class="result-card-label">Tempo informado</span>
+            <span class="result-card-value">${fmtHora(horas)}</span>
+          </article>
+
+          <article class="result-card">
+            <span class="result-card-label">Distância estimada</span>
+            <span class="result-card-value">${distanciaNm.toFixed(1)} NM</span>
+            <span class="result-card-detail">${(distanciaNm*NM_TO_KM).toFixed(0)} km</span>
+          </article>
+
+          <article class="result-card">
+            <span class="result-card-label">Consumo previsto</span>
+            <span class="result-card-value">${gastoFmt.principal}</span>
+            <span class="result-card-detail">${gastoFmt.equivalentes}</span>
+          </article>
+
+          <article class="result-card">
+            <span class="result-card-label">Remanescente</span>
+            <span class="result-card-value">${fuel>0 ? remanescenteFmt.principal : "Não calculado"}</span>
+            <span class="result-card-detail">${fuel>0 ? remanescenteFmt.equivalentes : "Informe o combustível no tanque"}</span>
+          </article>
+
+          <article class="result-card wide">
+            <span class="result-card-label">Situação da missão</span>
+            <span class="result-card-value mission-state ${fuel>0 ? (remanescenteLitros>=0 ? "state-ok" : "state-danger") : "state-neutral"}">
+              ${fuel>0 ? (remanescenteLitros>=0 ? "MISSÃO VIÁVEL" : "COMBUSTÍVEL INSUFICIENTE") : "AGUARDANDO COMBUSTÍVEL"}
+            </span>
+          </article>
+        </div>
+
+        ${fuel>0 ? criarBarraMissao(capacidadeLitros,combustivelLitros,gastoLitros) : ""}
+      </section>
+    `);
+  }
+
+  if(fuel<=0 && !(dist>0) && !(min>0)){
+    sections.push(`
+      <section class="result-section">
+        <h3 class="result-section-title">Aguardando dados</h3>
+        <article class="result-card wide">
+          <span class="result-card-label">Nenhum cenário calculado</span>
+          <span class="result-card-value mission-state state-neutral">
+            INFORME COMBUSTÍVEL, DISTÂNCIA OU TEMPO
+          </span>
+        </article>
+      </section>
+    `);
+  }
+
+  out.innerHTML=sections.join("");
 }
 
 function limpar(){
- document.getElementById("fuel").value="";
- document.getElementById("dist").value="";
- document.getElementById("tempo").value="";
- document.getElementById("out").innerHTML="";
- carregar();
+  document.getElementById("fuel").value="";
+  document.getElementById("dist").value="";
+  document.getElementById("tempo").value="";
+  out.innerHTML="";
+  /*
+    Mantém:
+    - aeronave selecionada
+    - velocidade editada
+    - consumo editado
+    - unidade escolhida
+    - configuração de tanque
+  */
 }
 
 carregar();
