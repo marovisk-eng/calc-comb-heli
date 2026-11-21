@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#111820">
-<title>Calculadora de Combustível para Helicópteros — V6.6</title>
+<title>Calculadora de Combustível para Helicópteros — V6.5</title>
 
 <style>
 :root{
@@ -776,6 +776,7 @@ select{
 .graph-mode-notice strong{color:#ffe4b8}
 .graph-active-flag{display:inline-block;border-radius:999px;background:#294355;border:1px solid #4a758c;padding:3px 8px;font-size:.72rem;font-weight:800;color:#b5e8f7}
 .graph-metric-value{font-variant-numeric:tabular-nums}
+.visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(max-width:480px){.graph-gauge-wrap{grid-template-columns:1fr}.graph-gauge svg{max-width:230px}.graph-gauge-summary{text-align:center}}
 
 
@@ -815,7 +816,7 @@ select{
       <h1>Calculadora de Combustível para Helicópteros</h1>
       <p class="header-subtitle">Painel Operacional de Planejamento de Missão</p>
     </div>
-    <div class="version-chip">V6.6.1 Candidata à auditoria</div>
+    <div class="version-chip">V6.5 Operacional</div>
   </div>
 </header>
 
@@ -992,18 +993,18 @@ select{
         </div>
         <div class="graph-field">
           <div class="graph-field-top"><label for="graphConsumption">Consumo por hora</label><output for="graphConsumption" id="graphConsumptionValue" class="graph-value">180,0 kg/h</output></div>
-          <input id="graphConsumption" class="graph-range" type="range" min="1" max="360" step="0.5" value="180">
+          <input id="graphConsumption" class="graph-range" type="range" min="0.01" max="360" step="0.01" value="180">
           <div class="graph-range-ends"><span>1 /h</span><span id="graphConsumptionMax">Faixa exploratória</span></div>
         </div>
         <div class="graph-field">
           <div class="graph-field-top"><label for="graphDistance">Distância da missão</label><output for="graphDistance" id="graphDistanceValue" class="graph-value">0,0 NM</output></div>
-          <input id="graphDistance" class="graph-range" type="range" min="0" max="400" step="1" value="0">
+          <input id="graphDistance" class="graph-range" type="range" min="0" max="400" step="0.001" value="0">
           <div class="graph-range-ends"><span>0</span><span id="graphDistanceMax">Faixa exploratória</span></div>
           <div class="graph-subrow"><label for="graphDistUnit">Unidade da distância</label><select class="graph-unit-select" id="graphDistUnit"><option value="NM">NM</option><option value="KM">km</option></select></div>
         </div>
         <div class="graph-field">
           <div class="graph-field-top"><label for="graphTime">Tempo da missão</label><output for="graphTime" id="graphTimeValue" class="graph-value">0h00min (0.0)</output></div>
-          <input id="graphTime" class="graph-range" type="range" min="0" max="240" step="1" value="0">
+          <input id="graphTime" class="graph-range" type="range" min="0" max="240" step="0.001" value="0">
           <div class="graph-range-ends"><span>0 min</span><span id="graphTimeMax">240 min</span></div>
         </div>
         <div class="graph-field graph-behavior">
@@ -1020,7 +1021,7 @@ select{
 
     <aside class="graph-output-card" aria-label="Resultados gráficos em tempo real">
       <div class="graph-card-head"><div><h2>Painel da aeronave</h2><p id="graphOutputSubtitle">AW119 · parâmetros estimados</p></div><span class="panel-index">04</span></div>
-      <div class="graph-body"><div id="graphOut" class="graph-panel-inner" aria-live="off"></div></div>
+      <div class="graph-body"><div id="graphOut" class="graph-panel-inner" aria-live="off"></div><div id="graphA11y" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div></div>
     </aside>
   </section>
 
@@ -1033,7 +1034,7 @@ select{
     procedimentos do operador e julgamento do piloto em comando.
 
     <div class="footer-source">
-      Capacidades, configurações e densidades cadastradas são referências para cálculo.
+      Capacidades, configurações e densidades cadastradas são referências para cálculo, não dados homologados ou validados nesta auditoria.
       Confirme a configuração real da aeronave, modificações e tanques auxiliares antes de usar
       a indicação “quanto falta para completar”.
     </div>
@@ -1051,6 +1052,8 @@ const NM_TO_KM = 1.852;
 */
 const DB = {
   "AW119":{
+    variant:"AW119 (configuração padrão de referência)", capacityBasis:"Utilizável declarada no cadastro",
+    dataStatus:"Referência cadastral; documento, edição e revisão não auditados",
     vel:130, cons:180, unit:"KG", density:0.800, fuelType:"Jet A / Jet A-1",
     source:"Capacidade utilizável de referência: 595 L.",
     tanks:[
@@ -1060,6 +1063,8 @@ const DB = {
   },
 
   "AS350 B2":{
+    variant:"AS350 B2, tanque padrão", capacityBasis:"Nominal declarada no cadastro",
+    dataStatus:"Referência cadastral; documento, edição e revisão não auditados",
     vel:125, cons:180, unit:"L", density:0.790, fuelType:"Jet A / Jet A-1",
     source:"Família AS350; capacidade de referência da configuração padrão.",
     tanks:[
@@ -1069,6 +1074,8 @@ const DB = {
   },
 
   "AS350 B3":{
+    variant:"AS350 B3, tanque padrão", capacityBasis:"Nominal declarada no cadastro",
+    dataStatus:"Referência cadastral; documento, edição e revisão não auditados",
     vel:130, cons:190, unit:"L", density:0.790, fuelType:"Jet A / Jet A-1",
     source:"Família AS350; capacidade de referência da configuração padrão.",
     tanks:[
@@ -1078,6 +1085,8 @@ const DB = {
   },
 
   "H125":{
+    variant:"H125, tanque padrão", capacityBasis:"Massa padrão declarada no cadastro",
+    dataStatus:"Referência cadastral; documento, edição e revisão não auditados",
     vel:130, cons:190, unit:"L", density:0.790, fuelType:"Jet A / Jet A-1",
     source:"Capacidade padrão de referência informada em massa.",
     tanks:[
@@ -1087,6 +1096,8 @@ const DB = {
   },
 
   "H145":{
+    variant:"H145, configuração civil de referência", capacityBasis:"Massa de referência; versão específica não comprovada",
+    dataStatus:"Referência cadastral; documento, edição e revisão não auditados",
     // Referência histórica de 280 L/h convertida para massa; NÃO é curva homologada.
     vel:140, cons:224, unit:"KG", density:0.800, fuelType:"Jet A / Jet A-1",
     source:"Capacidade padrão de referência; versões e opções podem variar.",
@@ -1097,6 +1108,8 @@ const DB = {
   },
 
   "Bell 412":{
+    variant:"Bell 412, perfis de tanque de referência", capacityBasis:"Capacidade nominal de referência; variante exata não comprovada",
+    dataStatus:"Referência cadastral; documento, edição e revisão não auditados",
     // Referência histórica de 420 L/h, convertida a 0,800 kg/L. Não homologada.
     vel:135, cons:741, unit:"LB", density:0.800, fuelType:"Aviation Turbine Fuel",
     source:"Configurações padrão e auxiliares de referência.",
@@ -1109,6 +1122,8 @@ const DB = {
   },
 
   "Bell 429":{
+    variant:"Bell 429, perfis de tanque de referência", capacityBasis:"Capacidade de referência; variante exata não comprovada",
+    dataStatus:"Referência cadastral; documento, edição e revisão não auditados",
     // Referência histórica de 300 L/h, convertida a 0,800 kg/L. Não homologada.
     vel:150, cons:529, unit:"LB", density:0.800, fuelType:"Aviation Turbine Fuel",
     source:"Configuração padrão e tanque auxiliar opcional de referência.",
@@ -1120,6 +1135,8 @@ const DB = {
   },
 
   "AW139":{
+    variant:"AW139, configuração padrão", capacityBasis:"Utilizável declarada no cadastro",
+    dataStatus:"Referência cadastral; documento, edição e revisão não auditados",
     vel:165, cons:400, unit:"KG", density:0.800, fuelType:"Jet A / Jet A-1",
     source:"Capacidade utilizável de referência; tanques auxiliares podem alterar o total.",
     tanks:[
@@ -1129,6 +1146,8 @@ const DB = {
   },
 
   "R44":{
+    variant:"R44, tanques de referência", capacityBasis:"Capacidade de referência; variante exata requer verificação",
+    dataStatus:"Referência cadastral; documento, edição e revisão não auditados",
     vel:110, cons:60, unit:"L", density:0.719, fuelType:"AVGAS",
     source:"R44 com referências de tanque principal e combinado.",
     tanks:[
@@ -1139,6 +1158,8 @@ const DB = {
   },
 
   "R66":{
+    variant:"R66, tanques de referência", capacityBasis:"Capacidade de referência; configuração exata requer verificação",
+    dataStatus:"Referência cadastral; documento, edição e revisão não auditados",
     vel:120, cons:95, unit:"L", density:0.804, fuelType:"Aviation Turbine Fuel",
     source:"Capacidade padrão e tanques auxiliares de referência.",
     tanks:[
@@ -1161,6 +1182,31 @@ const capacityNote = document.getElementById("capacityNote");
 const info = document.getElementById("info");
 const out = document.getElementById("out");
 const parameterStatus = document.getElementById("parameterStatus");
+let previousFuelUnit="KG";
+let previousDistUnit="NM";
+function changeFuelUnit(nextUnit){
+  const a=DB[heli.value];
+  const old=readSafe("fuel");
+  if(!old.empty&&old.valid){
+    const liters=paraLitros(old.value,previousFuelUnit,a.density);
+    const converted=deLitros(liters,nextUnit,a.density);
+    document.getElementById("fuel").value=Number.isFinite(converted)?converted.toFixed(6):"";
+  }
+  unit.value=nextUnit;
+  previousFuelUnit=nextUnit;
+  if(activeMode==="graphic")renderGraph();else out.innerHTML="";
+}
+function changeDistanceUnit(nextUnit){
+  const old=readSafe("dist");
+  if(!old.empty&&old.valid){
+    const nm=previousDistUnit==="KM"?old.value/NM_TO_KM:old.value;
+    const converted=nextUnit==="KM"?nm*NM_TO_KM:nm;
+    document.getElementById("dist").value=Number.isFinite(converted)?converted.toFixed(6):"";
+  }
+  distUnit.value=nextUnit;
+  previousDistUnit=nextUnit;
+  if(activeMode==="graphic")renderGraph();else out.innerHTML="";
+}
 
 for(const k in DB){
   const o=document.createElement("option");
@@ -1177,10 +1223,39 @@ function unitText(u){
 
 function fmtHora(h){
   if(!Number.isFinite(h) || h<0) return "—";
-  let hh=Math.floor(h);
-  let mm=Math.round((h-hh)*60);
-  if(mm===60){hh++;mm=0;}
-  return `${hh}h${String(mm).padStart(2,"0")}min (${h.toFixed(1)})`;
+  const totalMin=Math.round(h*60);
+  const hh=Math.floor(totalMin/60);
+  const mm=totalMin%60;
+  return `${hh}h${String(mm).padStart(2,"0")}min (${h.toFixed(1)} h)`;
+}
+// Para AUTONOMIA disponível, não arredondar para cima o tempo ofertado.
+function fmtAutonomia(h){
+  if(!Number.isFinite(h) || h<0) return "—";
+  if(h>0 && h*60<1) return "menos de 1 min (0.0 h)";
+  const totalMin=Math.floor(h*60+1e-9);
+  const hh=Math.floor(totalMin/60);
+  const mm=totalMin%60;
+  const dec=Math.floor(h*10+1e-10)/10;
+  return `${hh}h${String(mm).padStart(2,"0")}min (${dec.toFixed(1)} h)`;
+}
+const MAX_INPUT=1e8;
+const MIN_RATE=0.01;
+function readSafe(id,{positive=false,max=MAX_INPUT}={}){
+  const raw=document.getElementById(id).value.trim();
+  if(raw==="")return {empty:true,valid:!positive,value:null};
+  const n=Number(raw);
+  const valid=Number.isFinite(n)&&n>=0&&n<=max&&(!positive||n>=MIN_RATE);
+  return {empty:false,valid,value:valid?n:null};
+}
+function showError(title,message){
+  out.innerHTML=`<section class="result-section"><h3 class="result-section-title">${title}</h3><div class="fuel-warning">${message}</div></section>`;
+}
+function validDerived(...values){return values.every(v=>Number.isFinite(v)&&v>=0&&v<1e12);}
+function reasonForMission(remaining,expected){
+  const tol=Math.max(1e-7,Math.abs(expected)*1e-9);
+  if(remaining < -tol)return {text:"COMBUSTÍVEL INSUFICIENTE",css:"state-danger",tag:"Déficit estimado"};
+  if(remaining<=tol)return {text:"SALDO ZERO · SEM RESERVA",css:"state-neutral",tag:"Saldo na chegada"};
+  return {text:"SALDO POSITIVO · RESERVA NÃO VERIFICADA",css:"state-neutral",tag:"Saldo na chegada"};
 }
 
 function paraLitros(valor,u,density){
@@ -1251,7 +1326,9 @@ function atualizarCapacidade(){
 
   capacityNote.textContent =
     `${tank.note} Unidade: ${tank.unit}. ` +
-    `Combustível: ${a.fuelType}. Densidade de referência: ${a.density.toFixed(3)} kg/L.`;
+    `Base: ${a.capacityBasis}. ${a.variant}. ` +
+    `Referência: ${a.source} ` +
+    `${a.dataStatus}. Combustível: ${a.fuelType}. Densidade assumida: ${a.density.toFixed(3)} kg/L.`;
 }
 
 function carregar(){
@@ -1260,6 +1337,8 @@ function carregar(){
   vel.value=a.vel;
   cons.value=a.cons;
   unit.value=a.unit;
+  previousFuelUnit=a.unit;
+  previousDistUnit=distUnit.value;
 
   document.getElementById("aircraftDisplay").textContent=heli.value;
   document.getElementById("unitDisplay").textContent=a.unit;
@@ -1297,6 +1376,8 @@ heli.addEventListener("change",()=>{
 tankConfig.addEventListener("change",atualizarCapacidade);
 vel.addEventListener("input",atualizarStatusParametros);
 cons.addEventListener("input",atualizarStatusParametros);
+unit.addEventListener("change",()=>changeFuelUnit(unit.value));
+distUnit.addEventListener("change",()=>changeDistanceUnit(distUnit.value));
 
 function limitarPercentual(valor){
   return Math.min(Math.max(valor,0),100);
@@ -1465,239 +1546,91 @@ function criarSituacaoTanque(a,capacidadeL,combustivelL){
 
 function calcular(){
   const a=DB[heli.value];
-  const velocidade=parseFloat(vel.value);
-  const consumo=parseFloat(cons.value);
-
-  if(!Number.isFinite(velocidade) || velocidade<=0 ||
-     !Number.isFinite(consumo) || consumo<=0){
-    out.innerHTML=`
-      <section class="result-section">
-        <h3 class="result-section-title">Verificação necessária</h3>
-        <article class="result-card wide">
-          <span class="result-card-label">Parâmetros inválidos</span>
-          <span class="result-card-value mission-state state-danger">
-            INFORME VELOCIDADE E CONSUMO MAIORES QUE ZERO
-          </span>
-        </article>
-      </section>
-    `;
+  const v=readSafe("vel",{positive:true,max:1000});
+  const c=readSafe("cons",{positive:true,max:1e6});
+  const f=readSafe("fuel");
+  const dist=readSafe("dist");
+  const time=readSafe("tempo");
+  const cap=readSafe("capacity",{positive:true});
+  if([v,c,f,dist,time,cap].some(x=>!x.valid)){
+    showError("Entrada inválida","Revise os campos: velocidade e consumo devem ser positivos, capacidade válida, e combustível, distância e tempo não podem ser negativos ou excessivos. Nenhuma estimativa foi calculada.");
     return;
   }
-
-  // Evita tratar valores negativos ou malformados como uma missão válida.
-  for(const id of ["fuel","dist","tempo"]){
-    const raw=document.getElementById(id).value.trim();
-    if(raw!=="" && (!Number.isFinite(Number(raw)) || Number(raw)<0)){
-      out.innerHTML=`<section class="result-section"><h3 class="result-section-title">Dado inválido</h3><div class="fuel-warning">Informe um valor maior ou igual a zero para combustível, distância e tempo.</div></section>`;
-      return;
-    }
-  }
-  if(!Number.isFinite(Number(capacity.value)) || Number(capacity.value)<=0){
-    out.innerHTML=`<section class="result-section"><h3 class="result-section-title">Capacidade inválida</h3><div class="fuel-warning">Confira a capacidade do tanque selecionado.</div></section>`;
-    return;
-  }
-
-  const fuelRaw=document.getElementById("fuel").value.trim();
-  const fuel=fuelRaw==="" ? 0 : parseFloat(fuelRaw);
-
-  const capacidade=parseFloat(capacity.value);
-  const capacidadeUnidade=capacity.dataset.unit || "L";
-
-  const combustivelLitros=paraLitros(fuel,unit.value,a.density);
+  const velocidade=v.value;
+  const consumo=c.value;
+  const fuel=f.empty?null:f.value;
+  const capacidade=cap.value;
+  const capacidadeUnidade=capacity.dataset.unit||"L";
+  const combustivelLitros=f.empty?0:paraLitros(fuel,unit.value,a.density);
   const capacidadeLitros=paraLitros(capacidade,capacidadeUnidade,a.density);
   const consumoLitrosHora=paraLitros(consumo,a.unit,a.density);
-
-  const tanqueFmt=formatarCombustivel(combustivelLitros,a.unit,a);
+  const autonomia=combustivelLitros/consumoLitrosHora;
+  const alcance=autonomia*velocidade;
+  const nm=dist.empty?0:(distUnit.value==="KM"?dist.value/NM_TO_KM:dist.value);
+  const tempoDist=nm/velocidade;
+  const gastoDist=tempoDist*consumoLitrosHora;
+  const tempoH=time.empty?0:time.value/60;
+  const gastoTime=tempoH*consumoLitrosHora;
+  if(!validDerived(capacidadeLitros,combustivelLitros,consumoLitrosHora,autonomia,alcance,nm,tempoDist,gastoDist,tempoH,gastoTime,tempoH*velocidade)){
+    showError("Limite numérico","Os valores geram resultados fora da faixa numérica segura. Revise velocidade, consumo e quantidades informadas.");
+    return;
+  }
+  if(fuel!==null&&combustivelLitros>capacidadeLitros+1e-7){
+    const diferenca=combustivelLitros-capacidadeLitros;
+    showError("Capacidade ultrapassada",`O tanque contém ${diferenca.toFixed(1)} L acima da capacidade selecionada. Revise combustível, unidade ou configuração antes de calcular autonomia e alcance.`);
+    return;
+  }
   const taxaFmt=formatarTaxa(consumoLitrosHora,a.unit,a);
-
-  let sections=[];
-
+  const sections=[];
   sections.push(`
     <section class="result-section">
       <h3 class="result-section-title">Dados utilizados</h3>
       <div class="result-summary">
-        <article class="result-card">
-          <span class="result-card-label">Aeronave</span>
-          <span class="result-card-value">${heli.value}</span>
-        </article>
-
-        <article class="result-card">
-          <span class="result-card-label">Unidade operacional</span>
-          <span class="result-card-value unit-value">${a.unit}</span>
-        </article>
-
-        <article class="result-card">
-          <span class="result-card-label">Velocidade</span>
-          <span class="result-card-value">${velocidade.toFixed(0)} kt</span>
-        </article>
-
-        <article class="result-card">
-          <span class="result-card-label">Consumo informado</span>
-          <span class="result-card-value">${taxaFmt.principal}</span>
-          <span class="result-card-detail">${taxaFmt.equivalentes}</span>
-        </article>
-
-        <article class="result-card wide">
-          <span class="result-card-label">Configuração do tanque</span>
-          <span class="result-card-value">${a.tanks[Number(tankConfig.value)||0].name}</span>
-          <span class="result-card-detail">
-            Capacidade: ${capacidade.toFixed(1)} ${capacidadeUnidade} ·
-            Densidade de referência: ${a.density.toFixed(3)} kg/L
-          </span>
-        </article>
+        <article class="result-card"><span class="result-card-label">Aeronave</span><span class="result-card-value">${heli.value}</span></article>
+        <article class="result-card"><span class="result-card-label">Unidade operacional</span><span class="result-card-value unit-value">${a.unit}</span></article>
+        <article class="result-card"><span class="result-card-label">Velocidade</span><span class="result-card-value">${velocidade.toFixed(1)} kt</span></article>
+        <article class="result-card"><span class="result-card-label">Consumo informado</span><span class="result-card-value">${taxaFmt.principal}</span><span class="result-card-detail">${taxaFmt.equivalentes}</span></article>
+        <article class="result-card wide"><span class="result-card-label">Configuração do tanque</span><span class="result-card-value">${a.tanks[Number(tankConfig.value)||0].name}</span><span class="result-card-detail">${capacidade.toFixed(1)} ${capacidadeUnidade} · ${a.capacityBasis}. ${a.dataStatus}.</span></article>
       </div>
     </section>
   `);
-
-  if(fuel>0){
-    const autonomia=combustivelLitros/consumoLitrosHora;
-    const alcance=autonomia*velocidade;
-
+  if(fuel!==null){
+    const tanqueFmt=formatarCombustivel(combustivelLitros,a.unit,a);
     sections.push(`
-      <section class="result-section">
-        <h3 class="result-section-title">Combustível disponível</h3>
+      <section class="result-section"><h3 class="result-section-title">Combustível disponível</h3>
         <div class="result-cards">
-          <article class="result-card">
-            <span class="result-card-label">Tempo máximo</span>
-            <span class="result-card-value">${fmtHora(autonomia)}</span>
-          </article>
-
-          <article class="result-card">
-            <span class="result-card-label">Alcance máximo</span>
-            <span class="result-card-value">${alcance.toFixed(1)} NM</span>
-            <span class="result-card-detail">${(alcance*NM_TO_KM).toFixed(0)} km</span>
-          </article>
-
-          <article class="result-card wide">
-            <span class="result-card-label">Combustível no tanque</span>
-            <span class="result-card-value">${tanqueFmt.principal}</span>
-            <span class="result-card-detail">${tanqueFmt.equivalentes}</span>
-          </article>
+          <article class="result-card"><span class="result-card-label">Tempo máximo teórico · sem reserva</span><span class="result-card-value">${fmtAutonomia(autonomia)}</span></article>
+          <article class="result-card"><span class="result-card-label">Alcance máximo teórico · sem reserva</span><span class="result-card-value">${alcance.toFixed(1)} NM</span><span class="result-card-detail">${(alcance*NM_TO_KM).toFixed(0)} km</span></article>
+          <article class="result-card wide"><span class="result-card-label">Combustível no tanque</span><span class="result-card-value">${tanqueFmt.principal}</span><span class="result-card-detail">${tanqueFmt.equivalentes}</span></article>
         </div>
       </section>
     `);
-
-    sections.push(criarSituacaoTanque(a,capacidadeLitros,combustivelLitros));
+    if(combustivelLitros>0)sections.push(criarSituacaoTanque(a,capacidadeLitros,combustivelLitros));
   }
-
-  const dist=parseFloat(document.getElementById("dist").value||0);
-
-  if(dist>0){
-    const nm=distUnit.value==="KM" ? dist/NM_TO_KM : dist;
-    const tempo=nm/velocidade;
-    const gastoLitros=tempo*consumoLitrosHora;
-    const gastoFmt=formatarCombustivel(gastoLitros,a.unit,a);
-
-    const remanescenteLitros=fuel>0 ? combustivelLitros-gastoLitros : null;
-    const remanescenteSeguro=fuel>0 ? Math.max(remanescenteLitros,0) : null;
-    const remanescenteFmt=fuel>0 ? formatarCombustivel(remanescenteSeguro,a.unit,a) : null;
-
-    sections.push(`
+  function missionCard(section,flightTime,distanceNm,spentL){
+    const gastoFmt=formatarCombustivel(spentL,a.unit,a);
+    const remL=fuel===null?null:combustivelLitros-spentL;
+    const situation=fuel===null?null:reasonForMission(remL,spentL);
+    const saldoFmt=fuel===null?null:formatarCombustivel(Math.abs(remL),a.unit,a);
+    return `
       <section class="result-section">
-        <h3 class="result-section-title">Missão por distância</h3>
+        <h3 class="result-section-title">${section}</h3>
         <div class="result-cards">
-          <article class="result-card">
-            <span class="result-card-label">Tempo de voo</span>
-            <span class="result-card-value">${fmtHora(tempo)}</span>
-          </article>
-
-          <article class="result-card">
-            <span class="result-card-label">Distância</span>
-            <span class="result-card-value">${nm.toFixed(1)} NM</span>
-            <span class="result-card-detail">${(nm*NM_TO_KM).toFixed(0)} km</span>
-          </article>
-
-          <article class="result-card">
-            <span class="result-card-label">Consumo previsto</span>
-            <span class="result-card-value">${gastoFmt.principal}</span>
-            <span class="result-card-detail">${gastoFmt.equivalentes}</span>
-          </article>
-
-          <article class="result-card">
-            <span class="result-card-label">Remanescente</span>
-            <span class="result-card-value">${fuel>0 ? remanescenteFmt.principal : "Não calculado"}</span>
-            <span class="result-card-detail">${fuel>0 ? remanescenteFmt.equivalentes : "Informe o combustível no tanque"}</span>
-          </article>
-
-          <article class="result-card wide">
-            <span class="result-card-label">Situação da missão</span>
-            <span class="result-card-value mission-state ${fuel>0 ? (remanescenteLitros>=0 ? "state-ok" : "state-danger") : "state-neutral"}">
-              ${fuel>0 ? (remanescenteLitros>=0 ? "COMBUSTÍVEL SUFICIENTE NA ESTIMATIVA" : "COMBUSTÍVEL INSUFICIENTE") : "AGUARDANDO COMBUSTÍVEL"}
-            </span>
-          </article>
+          <article class="result-card"><span class="result-card-label">Tempo de voo estimado</span><span class="result-card-value">${fmtHora(flightTime)}</span></article>
+          <article class="result-card"><span class="result-card-label">Distância</span><span class="result-card-value">${distanceNm.toFixed(1)} NM</span><span class="result-card-detail">${(distanceNm*NM_TO_KM).toFixed(1)} km</span></article>
+          <article class="result-card"><span class="result-card-label">Consumo previsto</span><span class="result-card-value">${gastoFmt.principal}</span><span class="result-card-detail">${gastoFmt.equivalentes}</span></article>
+          <article class="result-card"><span class="result-card-label">${situation?situation.tag:"Remanescente"}</span><span class="result-card-value">${saldoFmt?saldoFmt.principal:"Não calculado"}</span><span class="result-card-detail">${saldoFmt?saldoFmt.equivalentes:"Informe o combustível no tanque"}</span></article>
+          <article class="result-card wide"><span class="result-card-label">Situação matemática · não é autorização de voo</span><span class="result-card-value mission-state ${situation?situation.css:"state-neutral"}">${situation?situation.text:"AGUARDANDO COMBUSTÍVEL"}</span><span class="result-card-detail">Reserva, condições reais e limitações operacionais não verificadas.</span></article>
         </div>
-
-        ${fuel>0 ? criarBarraMissao(capacidadeLitros,combustivelLitros,gastoLitros) : ""}
+        ${fuel!==null&&combustivelLitros>0?criarBarraMissao(capacidadeLitros,combustivelLitros,spentL):""}
       </section>
-    `);
+    `;
   }
-
-  const min=parseFloat(document.getElementById("tempo").value||0);
-
-  if(min>0){
-    const horas=min/60;
-    const distanciaNm=horas*velocidade;
-    const gastoLitros=horas*consumoLitrosHora;
-    const gastoFmt=formatarCombustivel(gastoLitros,a.unit,a);
-
-    const remanescenteLitros=fuel>0 ? combustivelLitros-gastoLitros : null;
-    const remanescenteSeguro=fuel>0 ? Math.max(remanescenteLitros,0) : null;
-    const remanescenteFmt=fuel>0 ? formatarCombustivel(remanescenteSeguro,a.unit,a) : null;
-
-    sections.push(`
-      <section class="result-section">
-        <h3 class="result-section-title">Missão por tempo</h3>
-        <div class="result-cards">
-          <article class="result-card">
-            <span class="result-card-label">Tempo informado</span>
-            <span class="result-card-value">${fmtHora(horas)}</span>
-          </article>
-
-          <article class="result-card">
-            <span class="result-card-label">Distância estimada</span>
-            <span class="result-card-value">${distanciaNm.toFixed(1)} NM</span>
-            <span class="result-card-detail">${(distanciaNm*NM_TO_KM).toFixed(0)} km</span>
-          </article>
-
-          <article class="result-card">
-            <span class="result-card-label">Consumo previsto</span>
-            <span class="result-card-value">${gastoFmt.principal}</span>
-            <span class="result-card-detail">${gastoFmt.equivalentes}</span>
-          </article>
-
-          <article class="result-card">
-            <span class="result-card-label">Remanescente</span>
-            <span class="result-card-value">${fuel>0 ? remanescenteFmt.principal : "Não calculado"}</span>
-            <span class="result-card-detail">${fuel>0 ? remanescenteFmt.equivalentes : "Informe o combustível no tanque"}</span>
-          </article>
-
-          <article class="result-card wide">
-            <span class="result-card-label">Situação da missão</span>
-            <span class="result-card-value mission-state ${fuel>0 ? (remanescenteLitros>=0 ? "state-ok" : "state-danger") : "state-neutral"}">
-              ${fuel>0 ? (remanescenteLitros>=0 ? "COMBUSTÍVEL SUFICIENTE NA ESTIMATIVA" : "COMBUSTÍVEL INSUFICIENTE") : "AGUARDANDO COMBUSTÍVEL"}
-            </span>
-          </article>
-        </div>
-
-        ${fuel>0 ? criarBarraMissao(capacidadeLitros,combustivelLitros,gastoLitros) : ""}
-      </section>
-    `);
+  if(nm>0)sections.push(missionCard("Missão por distância",tempoDist,nm,gastoDist));
+  if(tempoH>0)sections.push(missionCard("Missão por tempo",tempoH,tempoH*velocidade,gastoTime));
+  if(fuel===null&&nm===0&&tempoH===0){
+    sections.push(`<section class="result-section"><h3 class="result-section-title">Aguardando dados</h3><div class="result-card">Informe combustível, distância ou tempo para realizar um cálculo.</div></section>`);
   }
-
-  if(fuel<=0 && !(dist>0) && !(min>0)){
-    sections.push(`
-      <section class="result-section">
-        <h3 class="result-section-title">Aguardando dados</h3>
-        <article class="result-card wide">
-          <span class="result-card-label">Nenhum cenário calculado</span>
-          <span class="result-card-value mission-state state-neutral">
-            INFORME COMBUSTÍVEL, DISTÂNCIA OU TEMPO
-          </span>
-        </article>
-      </section>
-    `);
-  }
-
   out.innerHTML=sections.join("");
 }
 
@@ -1768,6 +1701,31 @@ function demoFuelFlowFactor(speed){
   return 0.70 + 0.15/r + 0.15*Math.pow(r,3);
 }
 
+function graphError(message){
+  graphOut.innerHTML=`<div class="graph-mode-notice"><strong>Entrada inválida — simulação interrompida.</strong> ${message}</div>`;
+  document.getElementById("graphA11y").textContent=`Entrada inválida. ${message}`;
+}
+function validateGraphInput(){
+  const checks=[
+    ["vel",true,1000,"velocidade"],
+    ["cons",true,1e6,"consumo"],
+    ["capacity",true,MAX_INPUT,"capacidade"],
+    ["fuel",false,MAX_INPUT,"combustível"],
+    ["dist",false,MAX_INPUT,"distância"],
+    ["tempo",false,MAX_INPUT,"tempo"]
+  ];
+  for(const [id,positive,max,name] of checks){
+    if(!readSafe(id,{positive,max}).valid)return `Revise ${name}: informe um valor numérico ${positive?"positivo":"não negativo"} dentro da faixa de cálculo.`;
+  }
+  const a=DB[heli.value];
+  const f=readSafe("fuel");
+  const c=readSafe("capacity",{positive:true});
+  const tank=paraLitros(c.value,capacity.dataset.unit||"L",a.density);
+  const liters=f.empty?0:paraLitros(f.value,unit.value,a.density);
+  if(!validDerived(tank,liters))return "Conversão do combustível ou da capacidade fora dos limites numéricos.";
+  if(!f.empty && liters>tank+1e-7)return "O combustível informado excede a capacidade selecionada; corrija os dados antes de simular.";
+  return "";
+}
 function graphData(){
   const a=DB[heli.value];
   const cap=Number(capacity.value);
@@ -1824,7 +1782,14 @@ function fuelNeedleGauge(percent){
 
 function renderGraph(){
   if(activeMode!=="graphic")return;
+  const inputError=validateGraphInput();
+  if(inputError){graphError(inputError);return;}
   const d=graphData();
+  const derivedHours=d.consLph>0?d.fuelL/d.consLph:NaN;
+  const checkMission=(d.distNm/d.speed)*d.consLph;
+  if(!validDerived(d.capL,d.fuelL,d.speed,d.hourly,d.consLph,derivedHours,derivedHours*d.speed,d.distNm,d.minutes,checkMission)){
+    graphError("Resultados derivados excedem os limites numéricos seguros.");return;
+  }
   const {a,capL,fuelL,consLph,speed,distNm,minutes,f,hourly,flowMode}=d;
   graphHeli.value=heli.value;
   graphFuelUnit.value=unit.value;
@@ -1844,7 +1809,7 @@ function renderGraph(){
   document.getElementById("graphOutputSubtitle").textContent=
     `${heli.value} · ${a.fuelType} · densidade ${a.density.toFixed(3)} kg/L`;
   document.getElementById("graphAircraftNote").textContent=
-    `Referência cadastrada: ${a.cons.toFixed(1)} ${a.unit}/h a ${a.vel} kt · ${a.tanks[Number(tankConfig.value)||0].name}`;
+    `Referência cadastrada: ${a.cons.toFixed(1)} ${a.unit}/h a ${a.vel} kt · ${a.tanks[Number(tankConfig.value)||0].name}. ${a.dataStatus}.`;
   document.getElementById("graphFlowInfo").textContent=flowMode==="demo"?
     "CURVA HIPOTÉTICA: o consumo horário reage à velocidade, mas os valores NÃO derivam do manual do helicóptero e NÃO servem para planejamento real.":
     "Consumo horário constante: o combustível total da rota muda com a velocidade porque o tempo de percurso muda.";
@@ -1859,16 +1824,23 @@ function renderGraph(){
   const sliders=[
     [graphFuel,f!==null?f:0,maxFuel,.1,"graphFuelValue",`${(f||0).toFixed(1)} ${unitText(unit.value)}`],
     [graphSpeed,speed,maxSpeed,1,"graphSpeedValue",`${speed.toFixed(0)} kt`],
-    [graphConsumption,hourly,maxCons,.5,"graphConsumptionValue",`${hourly.toFixed(1)} ${a.unit}/h`],
-    [graphDistance,d.d>0?d.d:0,Math.ceil(distMax),1,"graphDistanceValue",`${(d.d||0).toFixed(1)} ${distUnit.value}`],
-    [graphTime,minutes,Math.ceil(maxTime),1,"graphTimeValue",fmtHora(minutes/60)]
+    [graphConsumption,hourly,maxCons,.01,"graphConsumptionValue",`${hourly.toFixed(1)} ${a.unit}/h`],
+    [graphDistance,d.d>0?d.d:0,Math.ceil(distMax),.001,"graphDistanceValue",`${(d.d||0).toFixed(1)} ${distUnit.value}`],
+    [graphTime,minutes,Math.ceil(maxTime),.001,"graphTimeValue",fmtHora(minutes/60)]
   ];
   for(const [input,value,max,step,id,label] of sliders){
-    input.min=(input===graphSpeed || input===graphConsumption)?1:0;
+    input.min=input===graphSpeed?1:(input===graphConsumption?.01:0);
     input.max=String(max);input.step=String(step);
     input.value=String(clamp(value,Number(input.min),max));
     input.style.setProperty("--fill",`${clamp((Number(input.value)-Number(input.min))/(max-Number(input.min))*100,0,100)}%`);
-    document.getElementById(id).textContent=label;
+    const effective=Number(input.value);
+    const labelReal=input===graphTime?fmtHora(effective/60):
+      input===graphDistance?`${effective.toFixed(3)} ${distUnit.value}`:
+      input===graphFuel?`${effective.toFixed(1)} ${unitText(unit.value)}`:
+      input===graphSpeed?`${effective.toFixed(0)} kt`:
+      `${effective.toFixed(2)} ${a.unit}/h`;
+    document.getElementById(id).textContent=labelReal;
+    input.setAttribute("aria-valuetext",labelReal);
   }
   document.getElementById("graphFuelMin").textContent=`0 ${unitText(unit.value)}`;
   document.getElementById("graphFuelMax").textContent=`${maxFuel.toFixed(1)} ${unitText(unit.value)} · escala`;
@@ -1891,11 +1863,14 @@ function renderGraph(){
   const routeNm=primaryByTime?minutes/60*speed:distNm;
   const usedL=hours*consLph;
   const remainsL=fuelL-usedL;
-  const balance=remainsL>=0;
-  const deficit=remainsL<0;
+  const situation=reasonForMission(remainsL,usedL);
+  const deficit=situation.css==="state-danger";
   const tankWarning=fuelL>capL+1e-6?
     `<div class="fuel-warning">Quantidade acima da capacidade selecionada. Confira a configuração e a unidade.</div>`:"";
 
+  if(!validDerived(tankPct,refillL>=0?refillL:0,autHours,rangeNm,hours,routeNm,usedL,Math.abs(remainsL))){
+    graphError("Dados geraram valores derivados fora dos limites seguros.");return;
+  }
   const missionExists=hours>0.00001 && routeNm>0.00001;
   const miss=missionExists?`
     <section class="graph-scenario"><h3>Cenário único · controle ativo: <span class="graph-active-flag">${primaryByTime?"TEMPO":"DISTÂNCIA"}</span></h3>
@@ -1905,8 +1880,8 @@ function renderGraph(){
         <p>Consumo da missão<strong>${graphFuelLabel(usedL,a)}</strong></p>
         <p>${deficit?"Déficit de combustível":"Combustível restante"}<strong>${f===null?"—":graphFuelLabel(Math.abs(remainsL),a)}</strong></p>
       </div>
-      <div class="graph-status ${f===null?"neutral":balance?"info":"fail"}">
-        ${f===null?"Informe combustível para comparar":balance?"Saldo não negativo; reserva operacional NÃO verificada":"Combustível insuficiente para esta simulação"}
+      <div class="graph-status ${f===null?"neutral":deficit?"fail":"neutral"}">
+        ${f===null?"Informe combustível para comparar":situation.text+" — reserva operacional não verificada"}
       </div>
       <div class="fuel-track" style="margin-top:12px"><div class="fuel-segment fuel-consumed" style="width:${f!==null && fuelL>0?clamp(usedL/fuelL*100,0,100).toFixed(1):0}%"></div><div class="fuel-segment fuel-remaining" style="width:${f!==null && fuelL>0?clamp(remainsL/fuelL*100,0,100).toFixed(1):0}%"></div></div>
       <p class="capacity-note">Barra: parcela do combustível inicial consumida e remanescente.</p>
@@ -1926,7 +1901,7 @@ function renderGraph(){
       </div>
     </div>
     <div class="graph-metrics">
-      ${graphMetric("Autonomia estimada",fmtHora(autHours),"Sem reserva operacional")}
+      ${graphMetric("Autonomia máxima teórica",fmtAutonomia(autHours),"Sem reserva operacional; arredondada para baixo")}
       ${graphMetric("Alcance estimado",`${rangeNm.toFixed(1)} NM`,`${(rangeNm*NM_TO_KM).toFixed(0)} km · sem vento`)}
       ${graphMetric("Velocidade simulada",`${speed.toFixed(0)} kt`,"Velocidade selecionada")}
       ${graphMetric("Consumo horário",`${hourly.toFixed(1)} ${a.unit}/h`,flowMode==="demo"?"HIPOTÉTICO, NÃO CERTIFICADO":"Consumo constante informado")}
@@ -1937,6 +1912,7 @@ function renderGraph(){
     ${flowMode==="demo"?`<div class="graph-mode-notice"><strong>Modo demonstrativo — não utilizar para planejamento de voo.</strong> A relação entre velocidade e consumo apresentada neste modo é uma simulação matemática ilustrativa, não baseada em curvas de desempenho homologadas ou extraídas dos manuais oficiais dos fabricantes das aeronaves cadastradas. Para realizar cálculos utilizando o consumo informado pelo usuário, selecione “Consumo horário constante”.</div>`:""}
     <div class="graph-disclaimer">As alterações dos controles são instantâneas e calculadas localmente, sem internet. As faixas não representam limites certificados. Não considera reserva obrigatória, vento, densidade real, condições ambientais, táxi ou regime de potência. Em operação real, consulte RFM/POH e documentação do operador.</div>
   `;
+  // aria-live permanece silencioso durante o arraste; anunciar somente no "change".
 }
 
 function setMode(mode){
@@ -1947,6 +1923,7 @@ function setMode(mode){
   graphicPanel.hidden=isClassic;
   document.getElementById("modeClassic").setAttribute("aria-selected",String(isClassic));
   document.getElementById("modeGraphic").setAttribute("aria-selected",String(!isClassic));
+  updateTabKeyboard();
   if(isClassic){
     /* Na calculadora, preservamos o consumo horário de referência informado,
        NÃO a curva hipotética didática do modo gráfico. */
@@ -1966,9 +1943,10 @@ function setMode(mode){
       tempo:document.getElementById("tempo").value,
       changed:false
     };
-    const v=Number(vel.value)||DB[heli.value].vel;
-    graphAnchorSpeed=v;
-    graphAnchorFlow=Number(cons.value)||DB[heli.value].cons;
+    const speedInput=readSafe("vel",{positive:true,max:1000});
+    const flowInput=readSafe("cons",{positive:true,max:1e6});
+    graphAnchorSpeed=speedInput.valid?speedInput.value:NaN;
+    graphAnchorFlow=flowInput.valid?flowInput.value:NaN;
     graphDriver=(Number(document.getElementById("dist").value)>0)?"distance":
       (Number(document.getElementById("tempo").value)>0?"time":"distance");
     if(Number(document.getElementById("dist").value)>0 || Number(document.getElementById("tempo").value)>0){
@@ -2028,23 +2006,45 @@ graphHeli.addEventListener("change",()=>{
 });
 
 graphFuelUnit.addEventListener("change",()=>{
-  const a=DB[heli.value];
-  const old=getRawNumeric("fuel");
-  const oldLiters=old===null?null:paraLitros(old,unit.value,a.density);
-  unit.value=graphFuelUnit.value;
-  if(oldLiters!==null)document.getElementById("fuel").value=deLitros(oldLiters,unit.value,a.density).toFixed(2);
-  renderGraph();
+  changeFuelUnit(graphFuelUnit.value);
 });
 
 graphDistUnit.addEventListener("change",()=>{
-  const old=getRawNumeric("dist");
-  const nm=old===null?null:(distUnit.value==="KM"?old/NM_TO_KM:old);
-  distUnit.value=graphDistUnit.value;
-  if(nm!==null)document.getElementById("dist").value=(distUnit.value==="KM"?nm*NM_TO_KM:nm).toFixed(3);
+  changeDistanceUnit(graphDistUnit.value);
   graphEntryMission.changed=true;
-  renderGraph();
 });
 
+// Navegação por teclado (padrão ARIA tabs).
+const modeTabs=[document.getElementById("modeClassic"),document.getElementById("modeGraphic")];
+function updateTabKeyboard(){
+  modeTabs.forEach(t=>t.tabIndex=t.getAttribute("aria-selected")==="true"?0:-1);
+}
+for(const tab of modeTabs){
+  tab.addEventListener("keydown",event=>{
+    if(!["ArrowRight","ArrowLeft","Home","End"].includes(event.key))return;
+    event.preventDefault();
+    const ix=modeTabs.indexOf(tab);
+    const next=event.key==="Home"?0:event.key==="End"?1:
+      event.key==="ArrowRight"?(ix+1)%2:(ix+1)%2;
+    setMode(next===0?"classic":"graphic");
+    modeTabs[next].focus();
+  });
+}
+function announceGraphic(){
+  if(activeMode!=="graphic")return;
+  const v=validateGraphInput();
+  if(v){graphError(v);return;}
+  const d=graphData();
+  const hours=graphDriver==="time"?d.minutes/60:d.distNm/d.speed;
+  const remain=d.fuelL-hours*d.consLph;
+  document.getElementById("graphA11y").textContent=
+    `${heli.value}. Combustível ${(d.fuelL*d.a.density).toFixed(1)} quilogramas. `+
+    `Tempo ${fmtHora(hours)}. Consumo estimado ${(hours*d.consLph*d.a.density).toFixed(1)} quilogramas. `+
+    `Saldo ${remain.toFixed(1)} litros equivalentes. Reserva não verificada.`;
+}
+for(const slider of [graphFuel,graphSpeed,graphConsumption,graphDistance,graphTime]){
+  slider.addEventListener("change",announceGraphic);
+}
 document.getElementById("modeClassic").addEventListener("click",()=>setMode("classic"));
 document.getElementById("modeGraphic").addEventListener("click",()=>setMode("graphic"));
 setMode("classic");
