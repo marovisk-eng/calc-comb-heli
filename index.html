@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#111820">
 <title>Calculadora de Combustível para Helicópteros — V6.5</title>
-<!-- Checkpoint interno de auditoria: V6.5-R4. Versão pública V6.5; simulador educacional, dados cadastrais não certificados. -->
+<!-- V6.5 — correção visual de precisão decimal; simulador educacional, dados cadastrais não certificados. -->
 
 <style>
 :root{
@@ -1186,13 +1186,20 @@ const out = document.getElementById("out");
 const parameterStatus = document.getElementById("parameterStatus");
 let previousFuelUnit="KG";
 let previousDistUnit="NM";
+// Somente valores gerados pela calculadora são arredondados para uma casa.
+// Preserva entradas digitadas pelo usuário e valores positivos muito pequenos.
+function formatarCampoCalculado(valor){
+  if(!Number.isFinite(valor))return "";
+  if(valor!==0 && Math.abs(valor)<0.05)return Number(valor.toPrecision(6)).toString();
+  return valor.toFixed(1);
+}
 function changeFuelUnit(nextUnit){
   const a=DB[heli.value];
   const old=readSafe("fuel");
   if(!old.empty&&old.valid){
     const liters=paraLitros(old.value,previousFuelUnit,a.density);
     const converted=deLitros(liters,nextUnit,a.density);
-    document.getElementById("fuel").value=Number.isFinite(converted)?converted.toFixed(6):"";
+    document.getElementById("fuel").value=formatarCampoCalculado(converted);
   }
   unit.value=nextUnit;
   previousFuelUnit=nextUnit;
@@ -1203,7 +1210,7 @@ function changeDistanceUnit(nextUnit){
   if(!old.empty&&old.valid){
     const nm=previousDistUnit==="KM"?old.value/NM_TO_KM:old.value;
     const converted=nextUnit==="KM"?nm*NM_TO_KM:nm;
-    document.getElementById("dist").value=Number.isFinite(converted)?converted.toFixed(6):"";
+    document.getElementById("dist").value=formatarCampoCalculado(converted);
   }
   distUnit.value=nextUnit;
   previousDistUnit=nextUnit;
@@ -1738,8 +1745,10 @@ function sliderNumber(value){
   return value.toLocaleString("pt-BR",{minimumFractionDigits:0,maximumFractionDigits:10});
 }
 function sliderHourRate(value){
-  // Para taxas menores que 0,1, preservar dígitos significativos e evitar exibir "0,0".
-  return sliderNumber(value);
+  // Mostrador com uma casa decimal, exceto pequenas taxas positivas.
+  if(!Number.isFinite(value))return "—";
+  if(value!==0 && Math.abs(value)<0.05)return sliderNumber(value);
+  return value.toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1});
 }
 function clamp(n,lo,hi){return Math.max(lo,Math.min(hi,n));}
 
@@ -1804,11 +1813,11 @@ function synchronizeMission(driver){
   if(driver==="time"){
     const minutes=Math.max(0,Number(document.getElementById("tempo").value)||0);
     const distNm=speed*minutes/60;
-    document.getElementById("dist").value=(distUnit.value==="KM"?distNm*NM_TO_KM:distNm).toFixed(3);
+    document.getElementById("dist").value=formatarCampoCalculado(distUnit.value==="KM"?distNm*NM_TO_KM:distNm);
   }else{
     const distInput=Math.max(0,Number(document.getElementById("dist").value)||0);
     const nm=(distUnit.value==="KM")?distInput/NM_TO_KM:distInput;
-    document.getElementById("tempo").value=(nm/speed*60).toFixed(3);
+    document.getElementById("tempo").value=formatarCampoCalculado(nm/speed*60);
   }
 }
 
@@ -1874,7 +1883,7 @@ function renderGraph(){
   const maxDistNm=Math.max(300,Math.ceil((Math.max(aut*speed,distNm)*1.15)/50)*50);
   const distMax=distUnit.value==="KM"?maxDistNm*NM_TO_KM:maxDistNm;
   const maxTime=Math.max(240,Math.ceil(Math.max(aut*60,minutes)*1.12/30)*30);
-  // step=any preserva o valor original, inclusive 130,49 kt e 220,462262 lb.
+  // O controle aceita frações digitadas; arrastes geram valores com uma casa decimal.
   const sliders=[
     [graphFuel,f!==null?f:0,maxFuel,"any","graphFuelValue"],
     [graphSpeed,speed,maxSpeed,"any","graphSpeedValue"],
@@ -2014,14 +2023,18 @@ function setMode(mode){
 }
 
 function changeGraphValue(slider,targetId){
-  const val=Number(slider.value);
+  // Evita números longos gerados pelo arraste; mantém valores mínimos positivos.
+  const val=Number(formatarCampoCalculado(Number(slider.value)));
+  slider.value=String(val);
   if(slider===graphConsumption){
     const currentSpeed=Number(vel.value)||graphAnchorSpeed;
     const ratio=graphFlowMode.value==="demo"?demoFuelFlowFactor(currentSpeed):1;
     graphAnchorFlow=Math.max(MIN_RATE,val/ratio);
-    cons.value=String(Number(graphAnchorFlow.toPrecision(12)));
+    // O campo visível e a âncora devem representar o mesmo consumo informado.
+    cons.value=formatarCampoCalculado(graphAnchorFlow);
+    graphAnchorFlow=Number(cons.value);
   }else{
-    document.getElementById(targetId).value=slider.value;
+    document.getElementById(targetId).value=formatarCampoCalculado(val);
   }
   if(slider===graphDistance)graphDriver="distance";
   if(slider===graphTime)graphDriver="time";
