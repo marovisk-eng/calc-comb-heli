@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#111820">
-<title>Calculadora de Combustível para Helicópteros — V6.4</title>
+<title>Calculadora de Combustível para Helicópteros — V6.6</title>
 
 <style>
 :root{
@@ -645,6 +645,165 @@ select{
   .result-cards,.result-summary{grid-template-columns:1fr}
   .result-card.wide{grid-column:auto}
 }
+
+/* V6.6.1 — modo gráfico, sem bibliotecas externas */
+[hidden]{display:none!important}
+.mode-hero{
+  margin:0 0 18px;
+  display:flex;
+  justify-content:center;
+}
+.mode-switch{
+  width:min(100%, 760px);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:14px 16px 12px;
+  border:1px solid rgba(123,196,223,.22);
+  border-radius:16px;
+  background:linear-gradient(180deg,#18232D 0%, #16212B 100%);
+  box-shadow:0 12px 28px rgba(0,0,0,.20);
+  text-align:center;
+}
+.mode-kicker{
+  margin:0;
+  color:var(--accent-2);
+  font-size:.72rem;
+  font-weight:900;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.mode-actions{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.mode-button{
+  min-width:190px;
+  min-height:48px;
+  padding:12px 18px;
+  border:1px solid #415362;
+  border-radius:14px;
+  color:var(--text);
+  background:#131e27;
+  font-size:.98rem;
+  font-weight:900;
+  cursor:pointer;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
+}
+.mode-button[aria-selected="true"]{
+  background:#79BFD8;
+  color:#0d1b26;
+  border-color:#79BFD8;
+}
+.mode-caption{
+  margin:0;
+  color:var(--muted);
+  font-size:.80rem;
+  line-height:1.45;
+}
+.graph-layout{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(330px,.92fr);gap:16px;align-items:start}
+.graph-input-card,.graph-output-card{
+  border:1px solid var(--line);border-radius:16px;background:#17222C;
+  box-shadow:var(--shadow);overflow:hidden;
+}
+.graph-card-head{
+  padding:16px 18px;border-bottom:1px solid #334654;
+  display:flex;justify-content:space-between;gap:12px;align-items:center;
+}
+.graph-card-head h2{font-size:1.05rem;margin:0}
+.graph-card-head p{color:var(--muted);font-size:.77rem;margin:4px 0 0}
+.graph-body{padding:16px 18px}
+.graph-field{padding:11px 0 15px;border-bottom:1px solid rgba(157,170,180,.14)}
+.graph-field:last-of-type{border-bottom:0}
+.graph-field-top{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin-bottom:8px}
+.graph-field-top label{margin:0;color:#dce8f2;font-size:.88rem}
+.graph-value{white-space:nowrap;font-size:1.05rem;font-weight:900;font-variant-numeric:tabular-nums;color:#98D3E8}
+.graph-range{width:100%;height:35px;min-height:35px;margin:2px 0 0;padding:0;border:0;outline:none;background:transparent;cursor:pointer;accent-color:#72bdd8;touch-action:pan-y}
+.graph-range::-webkit-slider-runnable-track{height:9px;border-radius:999px;background:linear-gradient(to right,#72bdd8 0%,#72bdd8 var(--fill,0%),#263b4b var(--fill,0%),#263b4b 100%)}
+.graph-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;margin-top:-8px;background:#e7f3f7;border:3px solid #76bcd4;border-radius:50%;box-shadow:0 2px 8px #08141a}
+.graph-range{-webkit-appearance:none;appearance:none}
+.graph-range::-moz-range-track{height:9px;background:#263b4b;border-radius:999px}
+.graph-range::-moz-range-progress{height:9px;background:#72bdd8;border-radius:999px}
+.graph-range::-moz-range-thumb{width:20px;height:20px;background:#e7f3f7;border:3px solid #76bcd4;border-radius:50%}
+.graph-range:focus-visible{outline:2px solid #92d6ed;outline-offset:3px}
+.graph-range-ends{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:.71rem}
+.graph-unit-select{min-height:38px;width:auto;padding:7px 31px 7px 10px;font-size:.81rem}
+.graph-subrow{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:9px;margin:6px 0 5px}
+.graph-subrow label{margin:0;color:var(--muted)}
+.graph-note{padding:12px 13px;background:#172a34;border-left:3px solid #79bfd8;color:#b8c8d5;font-size:.76rem;line-height:1.6;border-radius:8px;margin-top:14px}
+.graph-panel-inner{display:grid;gap:12px}
+.graph-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.graph-metric{padding:12px;border:1px solid #374b57;border-radius:12px;background:#13202a;min-width:0}
+.graph-metric-label{display:block;font-size:.67rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800}
+.graph-metric-value{display:block;margin:6px 0 1px;overflow-wrap:anywhere;font-size:1.2rem;font-weight:900;font-variant-numeric:tabular-nums}
+.graph-metric-detail{display:block;color:var(--muted);font-size:.73rem;line-height:1.4}
+.graph-big-bar{overflow:hidden;display:flex;height:18px;margin-top:11px;background:#283844;border-radius:999px;border:1px solid #445562}
+.graph-big-bar > span{height:100%;background:#72bdd8;transition:width .12s linear}
+.graph-refill{padding:12px 14px;border:1px solid #416479;border-radius:12px;background:#172a35}
+.graph-refill strong{display:block;font-size:1.35rem;color:#e9f7fb;font-variant-numeric:tabular-nums}
+.graph-refill small{font-size:.77rem;color:#b8c8d4}
+.graph-scenario{padding:13px 14px;border:1px solid #41515d;border-radius:12px;background:#14222b}
+.graph-scenario h3{font-size:.88rem;color:#8fd0e7;margin:0 0 8px}
+.graph-scenario-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.graph-scenario-grid p{margin:0;font-size:.77rem;color:var(--muted)}
+.graph-scenario-grid strong{display:block;margin-top:3px;font-size:.95rem;color:var(--text);font-variant-numeric:tabular-nums}
+.graph-status{margin-top:10px;font-weight:800;font-size:.82rem;line-height:1.4}
+.graph-status.info{color:#eac878}.graph-status.fail{color:#f29c9c}.graph-status.neutral{color:#a6cbd8}
+.graph-disclaimer{font-size:.73rem;line-height:1.6;color:#b3c3cd;border:1px solid #43515b;background:#14202a;border-radius:10px;padding:11px 13px}
+.graph-output-card{position:sticky;top:16px}
+@media(max-width:950px){.graph-layout{grid-template-columns:1fr}.graph-output-card{position:static}}
+@media(max-width:600px){.graph-body{padding:14px}.graph-card-head{padding:15px}.graph-metrics{grid-template-columns:1fr 1fr}.mode-caption{font-size:.72rem}.mode-button{min-width:0;width:100%}.mode-actions{width:100%}.mode-switch{padding:13px 12px}}
+@media(max-width:385px){.graph-metrics,.graph-scenario-grid{grid-template-columns:1fr}}
+
+
+/* V6.6 — barras vinculadas, instrumento e leitura instantânea */
+.graph-behavior select{font-size:.82rem;min-height:43px}
+.graph-behavior .capacity-note{line-height:1.55;color:#f2d09a}
+.graph-gauge-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:center;border:1px solid #3b5565;border-radius:14px;background:#111e29;padding:12px}
+.graph-gauge{display:grid;justify-items:center;min-width:0}
+.graph-gauge svg{width:100%;max-width:265px;height:auto;display:block;overflow:visible}
+.graph-gauge svg .needle{stroke:#e8f4f8;stroke-width:4.2;stroke-linecap:round}
+.graph-gauge svg .needle-base{fill:#e8f4f8}
+.graph-gauge .gauge-title{margin:1px 0 0;text-align:center;font-size:.74rem;color:#a7bac7;font-weight:800}
+.graph-gauge .gauge-percentage{font-size:1.34rem;font-weight:900;color:#93d9ef;line-height:1.1}
+.graph-gauge-summary{display:grid;gap:7px;font-size:.8rem;color:#bed0dd;line-height:1.5}
+.graph-gauge-summary strong{color:#fff;font-size:1rem;font-variant-numeric:tabular-nums}
+.graph-mode-notice{background:#362b1f;border:1px solid #786240;border-radius:10px;color:#f2ddae;padding:11px 12px;font-size:.77rem;line-height:1.5}
+.graph-mode-notice strong{color:#ffe4b8}
+.graph-active-flag{display:inline-block;border-radius:999px;background:#294355;border:1px solid #4a758c;padding:3px 8px;font-size:.72rem;font-weight:800;color:#b5e8f7}
+.graph-metric-value{font-variant-numeric:tabular-nums}
+@media(max-width:480px){.graph-gauge-wrap{grid-template-columns:1fr}.graph-gauge svg{max-width:230px}.graph-gauge-summary{text-align:center}}
+
+
+/* Revisão visual: modo gráfico em verde-petróleo, calculadora em azul-ciano. */
+#modeGraphic[aria-selected="true"]{
+  background:#65C6A5;
+  border-color:#65C6A5;
+  color:#10291F;
+}
+#graphicPanel .graph-input-card,#graphicPanel .graph-output-card{
+  background:#192924;
+  border-color:#405F52;
+}
+#graphicPanel .graph-value,
+#graphicPanel .graph-gauge .gauge-percentage{color:#A9E8D3}
+#graphicPanel .graph-range{accent-color:#65C6A5}
+#graphicPanel .graph-range::-webkit-slider-runnable-track{
+  background:linear-gradient(to right,#65C6A5 0%,#65C6A5 var(--fill,0%),#324A41 var(--fill,0%),#324A41 100%);
+}
+#graphicPanel .graph-range::-webkit-slider-thumb{border-color:#65C6A5}
+#graphicPanel .graph-range::-moz-range-track{background:#324A41}
+#graphicPanel .graph-range::-moz-range-progress{background:#65C6A5}
+#graphicPanel .graph-range::-moz-range-thumb{border-color:#65C6A5}
+#graphicPanel .graph-big-bar > span{background:#65C6A5}
+#graphicPanel .graph-note{background:#19332C;border-left-color:#65C6A5}
+#graphicPanel .graph-active-flag{background:#22483C;border-color:#47856C;color:#C4F3DF}
+#graphicPanel .graph-refill{background:#1B3029;border-color:#466A58}
+
 </style>
 </head>
 
@@ -656,11 +815,22 @@ select{
       <h1>Calculadora de Combustível para Helicópteros</h1>
       <p class="header-subtitle">Painel Operacional de Planejamento de Missão</p>
     </div>
-    <div class="version-chip">V6.4 Operacional</div>
+    <div class="version-chip">V6.6.1 Candidata à auditoria</div>
   </div>
 </header>
 
 <main class="container">
+
+  <section class="mode-hero" aria-label="Alternar visualização da calculadora">
+    <nav class="mode-switch" aria-label="Modo de uso">
+      <p class="mode-kicker">Escolha a forma de uso</p>
+      <div class="mode-actions" role="tablist" aria-label="Forma de visualização">
+        <button type="button" class="mode-button" id="modeClassic" role="tab" aria-selected="true" aria-controls="classicPanel">Modo Calculadora</button>
+        <button type="button" class="mode-button" id="modeGraphic" role="tab" aria-selected="false" aria-controls="graphicPanel">Modo Gráfico</button>
+      </div>
+      <p class="mode-caption">Planeje sua missão com cálculos detalhados ou simulação gráfica em tempo real.</p>
+    </nav>
+  </section>
 
   <section class="mission-strip" aria-label="Resumo operacional">
     <article class="status-cell">
@@ -679,7 +849,7 @@ select{
     </article>
   </section>
 
-  <section class="dashboard">
+  <section class="dashboard" id="classicPanel" role="tabpanel" aria-labelledby="modeClassic">
     <div class="panel">
       <header class="panel-header">
         <div class="panel-title-wrap">
@@ -794,9 +964,69 @@ select{
     </aside>
   </section>
 
+
+  <section class="graph-layout" id="graphicPanel" role="tabpanel" aria-labelledby="modeGraphic" hidden>
+    <section class="graph-input-card">
+      <div class="graph-card-head"><div><h2>Simulador interativo</h2><p>Arraste: resultados, ponteiro e barras respondem imediatamente.</p></div><span class="panel-index">03</span></div>
+      <div class="graph-body">
+        <div class="graph-field" style="padding-top:0">
+          <label for="graphHeli">Tipo de helicóptero</label>
+          <select id="graphHeli"></select>
+          <p class="capacity-note" id="graphAircraftNote"></p>
+        </div>
+        <div class="graph-field">
+          <label for="graphTankConfig">Configuração do tanque</label>
+          <select id="graphTankConfig"></select>
+          <p class="capacity-note" id="graphTankNote">A capacidade acompanha a configuração selecionada.</p>
+        </div>
+        <div class="graph-field">
+          <div class="graph-field-top"><label for="graphFuel">Combustível no tanque</label><output for="graphFuel" id="graphFuelValue" class="graph-value">0,0 kg</output></div>
+          <input id="graphFuel" type="range" class="graph-range" min="0" max="476" value="0" step="0.1">
+          <div class="graph-range-ends"><span id="graphFuelMin">0</span><span id="graphFuelMax">Capacidade selecionada</span></div>
+          <div class="graph-subrow"><label for="graphFuelUnit">Unidade do combustível</label><select class="graph-unit-select" id="graphFuelUnit"><option value="KG">kg</option><option value="L">litros</option><option value="LB">lb</option></select></div>
+        </div>
+        <div class="graph-field">
+          <div class="graph-field-top"><label for="graphSpeed">Velocidade utilizada</label><output for="graphSpeed" id="graphSpeedValue" class="graph-value">130 kt</output></div>
+          <input id="graphSpeed" class="graph-range" type="range" min="1" max="200" step="1" value="130">
+          <div class="graph-range-ends"><span>1 kt</span><span id="graphSpeedMax">Faixa exploratória</span></div>
+        </div>
+        <div class="graph-field">
+          <div class="graph-field-top"><label for="graphConsumption">Consumo por hora</label><output for="graphConsumption" id="graphConsumptionValue" class="graph-value">180,0 kg/h</output></div>
+          <input id="graphConsumption" class="graph-range" type="range" min="1" max="360" step="0.5" value="180">
+          <div class="graph-range-ends"><span>1 /h</span><span id="graphConsumptionMax">Faixa exploratória</span></div>
+        </div>
+        <div class="graph-field">
+          <div class="graph-field-top"><label for="graphDistance">Distância da missão</label><output for="graphDistance" id="graphDistanceValue" class="graph-value">0,0 NM</output></div>
+          <input id="graphDistance" class="graph-range" type="range" min="0" max="400" step="1" value="0">
+          <div class="graph-range-ends"><span>0</span><span id="graphDistanceMax">Faixa exploratória</span></div>
+          <div class="graph-subrow"><label for="graphDistUnit">Unidade da distância</label><select class="graph-unit-select" id="graphDistUnit"><option value="NM">NM</option><option value="KM">km</option></select></div>
+        </div>
+        <div class="graph-field">
+          <div class="graph-field-top"><label for="graphTime">Tempo da missão</label><output for="graphTime" id="graphTimeValue" class="graph-value">0h00min (0.0)</output></div>
+          <input id="graphTime" class="graph-range" type="range" min="0" max="240" step="1" value="0">
+          <div class="graph-range-ends"><span>0 min</span><span id="graphTimeMax">240 min</span></div>
+        </div>
+        <div class="graph-field graph-behavior">
+          <label for="graphFlowMode">Relação entre velocidade e consumo horário</label>
+          <select id="graphFlowMode">
+            <option value="demo">Vinculado — demonstração didática</option>
+            <option value="fixed">Consumo horário constante</option>
+          </select>
+          <p class="capacity-note" id="graphFlowInfo">Demonstração matemática exploratória: não representa curvas de desempenho do fabricante.</p>
+        </div>
+        <div class="graph-note">Tudo se atualiza durante o movimento. <b>Distância e tempo estão vinculados:</b> arraste um para calcular o outro. Arrastar a velocidade recalcula o consumo total e, no perfil didático, também o consumo horário. <b>Não use a curva didática para planejar voo real.</b></div>
+      </div>
+    </section>
+
+    <aside class="graph-output-card" aria-label="Resultados gráficos em tempo real">
+      <div class="graph-card-head"><div><h2>Painel da aeronave</h2><p id="graphOutputSubtitle">AW119 · parâmetros estimados</p></div><span class="panel-index">04</span></div>
+      <div class="graph-body"><div id="graphOut" class="graph-panel-inner" aria-live="off"></div></div>
+    </aside>
+  </section>
+
   <div class="footer-note">
     <strong>Aviso operacional:</strong>
-    esta calculadora é uma ferramenta de apoio educacional, treinamento e planejamento.
+    esta calculadora é uma ferramenta de apoio educacional, treinamento e planejamento. A indicação de combustível suficiente não verifica reservas operacionais, vento ou limitações de desempenho.
     Os resultados são estimativas e podem variar em função de peso bruto, altitude, temperatura,
     vento, perfil de missão, configuração operacional, estado dos motores, carga transportada
     e limitações específicas. Em operação real, prevalecem o RFM/POH, documentação oficial,
@@ -857,7 +1087,8 @@ const DB = {
   },
 
   "H145":{
-    vel:140, cons:280, unit:"KG", density:0.800, fuelType:"Jet A / Jet A-1",
+    // Referência histórica de 280 L/h convertida para massa; NÃO é curva homologada.
+    vel:140, cons:224, unit:"KG", density:0.800, fuelType:"Jet A / Jet A-1",
     source:"Capacidade padrão de referência; versões e opções podem variar.",
     tanks:[
       {name:"Padrão civil",capacity:723,unit:"KG",note:"Capacidade padrão de referência; versões e opções podem variar."},
@@ -866,7 +1097,8 @@ const DB = {
   },
 
   "Bell 412":{
-    vel:135, cons:420, unit:"LB", density:0.800, fuelType:"Aviation Turbine Fuel",
+    // Referência histórica de 420 L/h, convertida a 0,800 kg/L. Não homologada.
+    vel:135, cons:741, unit:"LB", density:0.800, fuelType:"Aviation Turbine Fuel",
     source:"Configurações padrão e auxiliares de referência.",
     tanks:[
       {name:"Padrão",capacity:1251,unit:"L",note:"Tanque padrão."},
@@ -877,7 +1109,8 @@ const DB = {
   },
 
   "Bell 429":{
-    vel:150, cons:300, unit:"LB", density:0.800, fuelType:"Aviation Turbine Fuel",
+    // Referência histórica de 300 L/h, convertida a 0,800 kg/L. Não homologada.
+    vel:150, cons:529, unit:"LB", density:0.800, fuelType:"Aviation Turbine Fuel",
     source:"Configuração padrão e tanque auxiliar opcional de referência.",
     tanks:[
       {name:"Padrão",capacity:821,unit:"L",note:"Capacidade padrão de referência."},
@@ -1056,7 +1289,11 @@ function atualizarStatusParametros(){
   parameterStatus.classList.toggle("custom",!padrao);
 }
 
-heli.addEventListener("change",carregar);
+heli.addEventListener("change",()=>{
+  // Mudança de aeronave: evita reinterpretar o combustível anterior na nova unidade.
+  document.getElementById("fuel").value="";
+  carregar();
+});
 tankConfig.addEventListener("change",atualizarCapacidade);
 vel.addEventListener("input",atualizarStatusParametros);
 cons.addEventListener("input",atualizarStatusParametros);
@@ -1247,6 +1484,19 @@ function calcular(){
     return;
   }
 
+  // Evita tratar valores negativos ou malformados como uma missão válida.
+  for(const id of ["fuel","dist","tempo"]){
+    const raw=document.getElementById(id).value.trim();
+    if(raw!=="" && (!Number.isFinite(Number(raw)) || Number(raw)<0)){
+      out.innerHTML=`<section class="result-section"><h3 class="result-section-title">Dado inválido</h3><div class="fuel-warning">Informe um valor maior ou igual a zero para combustível, distância e tempo.</div></section>`;
+      return;
+    }
+  }
+  if(!Number.isFinite(Number(capacity.value)) || Number(capacity.value)<=0){
+    out.innerHTML=`<section class="result-section"><h3 class="result-section-title">Capacidade inválida</h3><div class="fuel-warning">Confira a capacidade do tanque selecionado.</div></section>`;
+    return;
+  }
+
   const fuelRaw=document.getElementById("fuel").value.trim();
   const fuel=fuelRaw==="" ? 0 : parseFloat(fuelRaw);
 
@@ -1372,7 +1622,7 @@ function calcular(){
           <article class="result-card wide">
             <span class="result-card-label">Situação da missão</span>
             <span class="result-card-value mission-state ${fuel>0 ? (remanescenteLitros>=0 ? "state-ok" : "state-danger") : "state-neutral"}">
-              ${fuel>0 ? (remanescenteLitros>=0 ? "MISSÃO VIÁVEL" : "COMBUSTÍVEL INSUFICIENTE") : "AGUARDANDO COMBUSTÍVEL"}
+              ${fuel>0 ? (remanescenteLitros>=0 ? "COMBUSTÍVEL SUFICIENTE NA ESTIMATIVA" : "COMBUSTÍVEL INSUFICIENTE") : "AGUARDANDO COMBUSTÍVEL"}
             </span>
           </article>
         </div>
@@ -1424,7 +1674,7 @@ function calcular(){
           <article class="result-card wide">
             <span class="result-card-label">Situação da missão</span>
             <span class="result-card-value mission-state ${fuel>0 ? (remanescenteLitros>=0 ? "state-ok" : "state-danger") : "state-neutral"}">
-              ${fuel>0 ? (remanescenteLitros>=0 ? "MISSÃO VIÁVEL" : "COMBUSTÍVEL INSUFICIENTE") : "AGUARDANDO COMBUSTÍVEL"}
+              ${fuel>0 ? (remanescenteLitros>=0 ? "COMBUSTÍVEL SUFICIENTE NA ESTIMATIVA" : "COMBUSTÍVEL INSUFICIENTE") : "AGUARDANDO COMBUSTÍVEL"}
             </span>
           </article>
         </div>
@@ -1467,6 +1717,337 @@ function limpar(){
 }
 
 carregar();
+
+
+/* V6.6 — Modo gráfico acoplado: preserva a calculadora operacional V6.4. */
+const graphicPanel=document.getElementById("graphicPanel");
+const classicPanel=document.getElementById("classicPanel");
+const graphHeli=document.getElementById("graphHeli");
+const graphOut=document.getElementById("graphOut");
+const graphFuel=document.getElementById("graphFuel");
+const graphSpeed=document.getElementById("graphSpeed");
+const graphConsumption=document.getElementById("graphConsumption");
+const graphDistance=document.getElementById("graphDistance");
+const graphTime=document.getElementById("graphTime");
+const graphFuelUnit=document.getElementById("graphFuelUnit");
+const graphDistUnit=document.getElementById("graphDistUnit");
+const graphTankConfig=document.getElementById("graphTankConfig");
+const graphFlowMode=document.getElementById("graphFlowMode");
+let activeMode="classic";
+let graphDriver="distance"; // Última barra controlada: distância ou tempo.
+let graphEntryMission={dist:"",tempo:"",changed:false};
+let graphAnchorSpeed=130;
+let graphAnchorFlow=180; // Valor âncora na unidade operacional da aeronave.
+
+for(const name of Object.keys(DB)){
+  const option=document.createElement("option");
+  option.value=name;
+  option.textContent=name;
+  graphHeli.appendChild(option);
+}
+
+function getRawNumeric(id){
+  const e=document.getElementById(id);
+  const v=e.value.trim();
+  if(v==="")return null;
+  const n=Number(v);
+  return Number.isFinite(n)?n:null;
+}
+
+function graphNumber(n,places=1){return Number.isFinite(n)?n.toFixed(places):"—";}
+function clamp(n,lo,hi){return Math.max(lo,Math.min(hi,n));}
+
+/*
+  FUNÇÃO NÃO CERTIFICADA, EXCLUSIVAMENTE DIDÁTICA.
+  É uma curva matemática genérica adimensional normalizada na velocidade âncora.
+  NÃO atribuir seus coeficientes a AW119/Bell/Airbus/Robinson, RFM ou fabricante.
+  Não considerar limites operacionais; não transferir seu consumo ao painel clássico.
+*/
+function demoFuelFlowFactor(speed){
+  const r=clamp(speed/Math.max(1,graphAnchorSpeed),0.25,2.2);
+  return 0.70 + 0.15/r + 0.15*Math.pow(r,3);
+}
+
+function graphData(){
+  const a=DB[heli.value];
+  const cap=Number(capacity.value);
+  const capL=paraLitros(cap,capacity.dataset.unit||"L",a.density);
+  const f=getRawNumeric("fuel");
+  const v=getRawNumeric("vel");
+  const d=getRawNumeric("dist");
+  const t=getRawNumeric("tempo");
+  const speed=(v!==null&&v>0)?v:0;
+  const fuelL=(f!==null&&f>=0)?paraLitros(f,unit.value,a.density):0;
+  const flowMode=graphFlowMode.value;
+  const multiplier=(flowMode==="demo" && speed>0)?demoFuelFlowFactor(speed):1;
+  const hourly=graphAnchorFlow*multiplier;
+  const consLph=paraLitros(hourly,a.unit,a.density);
+  const distNm=(d!==null&&d>0)?(distUnit.value==="KM"?d/NM_TO_KM:d):0;
+  const minutes=(t!==null&&t>0)?t:0;
+  return {a,capL,fuelL,speed,distNm,minutes,f,v,d,t,hourly,consLph,flowMode};
+}
+
+function synchronizeMission(driver){
+  const speed=Number(vel.value);
+  if(!(speed>0))return;
+  if(driver==="time"){
+    const minutes=Math.max(0,Number(document.getElementById("tempo").value)||0);
+    const distNm=speed*minutes/60;
+    document.getElementById("dist").value=(distUnit.value==="KM"?distNm*NM_TO_KM:distNm).toFixed(3);
+  }else{
+    const distInput=Math.max(0,Number(document.getElementById("dist").value)||0);
+    const nm=(distUnit.value==="KM")?distInput/NM_TO_KM:distInput;
+    document.getElementById("tempo").value=(nm/speed*60).toFixed(3);
+  }
+}
+
+function graphMetric(label,value,detail=""){
+  return `<article class="graph-metric"><span class="graph-metric-label">${label}</span><strong class="graph-metric-value">${value}</strong><span class="graph-metric-detail">${detail}</span></article>`;
+}
+
+function graphFuelLabel(liters,a){return formatarCombustivel(liters,a.unit,a).principal;}
+
+function fuelNeedleGauge(percent){
+  const safe=clamp(percent,0,100), angle=-90+safe*1.8;
+  return `<div class="graph-gauge" role="img" aria-label="Indicador do tanque: ${percent.toFixed(1)} por cento">
+    <svg viewBox="0 0 260 155" aria-hidden="true" focusable="false">
+      <path d="M 30 120 A 100 100 0 0 1 230 120" fill="none" stroke="#334655" stroke-width="15" stroke-linecap="round"/>
+      <path d="M 30 120 A 100 100 0 0 1 230 120" fill="none" stroke="#65C6A5" stroke-width="12" stroke-linecap="round" pathLength="100" stroke-dasharray="${safe} 100"/>
+      <line class="needle" x1="130" y1="120" x2="130" y2="40" transform="rotate(${angle.toFixed(2)} 130 120)"/>
+      <circle class="needle-base" cx="130" cy="120" r="8"/>
+      <text x="17" y="140" fill="#aec5d4" font-size="12">0</text>
+      <text x="225" y="140" fill="#aec5d4" font-size="12">100</text>
+    </svg>
+    <span class="gauge-percentage">${percent.toFixed(1)}%</span><span class="gauge-title">NÍVEL DE COMBUSTÍVEL</span>
+  </div>`;
+}
+
+function renderGraph(){
+  if(activeMode!=="graphic")return;
+  const d=graphData();
+  const {a,capL,fuelL,consLph,speed,distNm,minutes,f,hourly,flowMode}=d;
+  graphHeli.value=heli.value;
+  graphFuelUnit.value=unit.value;
+  graphDistUnit.value=distUnit.value;
+  if(graphTankConfig.dataset.model!==heli.value){
+    graphTankConfig.innerHTML="";
+    a.tanks.forEach((tank,index)=>{
+      const option=document.createElement("option");
+      option.value=String(index);option.textContent=tank.name;
+      graphTankConfig.appendChild(option);
+    });
+    graphTankConfig.dataset.model=heli.value;
+  }
+  graphTankConfig.value=tankConfig.value;
+  document.getElementById("graphTankNote").textContent=
+    `${a.tanks[Number(tankConfig.value)||0].note} ${a.tanks[Number(tankConfig.value)||0].custom?"Capacidade personalizada: editar no modo tradicional.":""}`;
+  document.getElementById("graphOutputSubtitle").textContent=
+    `${heli.value} · ${a.fuelType} · densidade ${a.density.toFixed(3)} kg/L`;
+  document.getElementById("graphAircraftNote").textContent=
+    `Referência cadastrada: ${a.cons.toFixed(1)} ${a.unit}/h a ${a.vel} kt · ${a.tanks[Number(tankConfig.value)||0].name}`;
+  document.getElementById("graphFlowInfo").textContent=flowMode==="demo"?
+    "CURVA HIPOTÉTICA: o consumo horário reage à velocidade, mas os valores NÃO derivam do manual do helicóptero e NÃO servem para planejamento real.":
+    "Consumo horário constante: o combustível total da rota muda com a velocidade porque o tempo de percurso muda.";
+
+  const maxFuel=Math.max(0.1,Math.ceil(deLitros(capL,unit.value,a.density)*10)/10,Number(f)||0);
+  const maxSpeed=Math.max(150,Math.ceil(a.vel*1.5/10)*10,speed);
+  const maxCons=Math.max(10,Math.ceil(Math.max(a.cons*2,hourly*1.12)/10)*10);
+  const aut=consLph>0?fuelL/consLph:0;
+  const maxDistNm=Math.max(300,Math.ceil((Math.max(aut*speed,distNm)*1.15)/50)*50);
+  const distMax=distUnit.value==="KM"?maxDistNm*NM_TO_KM:maxDistNm;
+  const maxTime=Math.max(240,Math.ceil(Math.max(aut*60,minutes)*1.12/30)*30);
+  const sliders=[
+    [graphFuel,f!==null?f:0,maxFuel,.1,"graphFuelValue",`${(f||0).toFixed(1)} ${unitText(unit.value)}`],
+    [graphSpeed,speed,maxSpeed,1,"graphSpeedValue",`${speed.toFixed(0)} kt`],
+    [graphConsumption,hourly,maxCons,.5,"graphConsumptionValue",`${hourly.toFixed(1)} ${a.unit}/h`],
+    [graphDistance,d.d>0?d.d:0,Math.ceil(distMax),1,"graphDistanceValue",`${(d.d||0).toFixed(1)} ${distUnit.value}`],
+    [graphTime,minutes,Math.ceil(maxTime),1,"graphTimeValue",fmtHora(minutes/60)]
+  ];
+  for(const [input,value,max,step,id,label] of sliders){
+    input.min=(input===graphSpeed || input===graphConsumption)?1:0;
+    input.max=String(max);input.step=String(step);
+    input.value=String(clamp(value,Number(input.min),max));
+    input.style.setProperty("--fill",`${clamp((Number(input.value)-Number(input.min))/(max-Number(input.min))*100,0,100)}%`);
+    document.getElementById(id).textContent=label;
+  }
+  document.getElementById("graphFuelMin").textContent=`0 ${unitText(unit.value)}`;
+  document.getElementById("graphFuelMax").textContent=`${maxFuel.toFixed(1)} ${unitText(unit.value)} · escala`;
+  document.getElementById("graphSpeedMax").textContent=`${maxSpeed} kt · escala exploratória`;
+  document.getElementById("graphConsumptionMax").textContent=`${maxCons} ${a.unit}/h · escala`;
+  document.getElementById("graphDistanceMax").textContent=`${Math.ceil(distMax)} ${distUnit.value} · escala`;
+  document.getElementById("graphTimeMax").textContent=`${Math.ceil(maxTime)} min · escala`;
+  if(!(speed>0 && consLph>0 && capL>0)){
+    graphOut.innerHTML=`<div class="graph-disclaimer">Informe velocidade, consumo e capacidade positivos no modo tradicional.</div>`;
+    return;
+  }
+
+  const tankPct=fuelL/capL*100;
+  const refillL=capL-fuelL;
+  const fuelFmt=formatarCombustivel(fuelL,a.unit,a);
+  const autHours=fuelL/consLph;
+  const rangeNm=autHours*speed;
+  const primaryByTime=graphDriver==="time";
+  const hours=primaryByTime?minutes/60:distNm/speed;
+  const routeNm=primaryByTime?minutes/60*speed:distNm;
+  const usedL=hours*consLph;
+  const remainsL=fuelL-usedL;
+  const balance=remainsL>=0;
+  const deficit=remainsL<0;
+  const tankWarning=fuelL>capL+1e-6?
+    `<div class="fuel-warning">Quantidade acima da capacidade selecionada. Confira a configuração e a unidade.</div>`:"";
+
+  const missionExists=hours>0.00001 && routeNm>0.00001;
+  const miss=missionExists?`
+    <section class="graph-scenario"><h3>Cenário único · controle ativo: <span class="graph-active-flag">${primaryByTime?"TEMPO":"DISTÂNCIA"}</span></h3>
+      <div class="graph-scenario-grid">
+        <p>Tempo calculado<strong>${fmtHora(hours)}</strong></p>
+        <p>Distância calculada<strong>${routeNm.toFixed(1)} NM · ${(routeNm*NM_TO_KM).toFixed(0)} km</strong></p>
+        <p>Consumo da missão<strong>${graphFuelLabel(usedL,a)}</strong></p>
+        <p>${deficit?"Déficit de combustível":"Combustível restante"}<strong>${f===null?"—":graphFuelLabel(Math.abs(remainsL),a)}</strong></p>
+      </div>
+      <div class="graph-status ${f===null?"neutral":balance?"info":"fail"}">
+        ${f===null?"Informe combustível para comparar":balance?"Saldo não negativo; reserva operacional NÃO verificada":"Combustível insuficiente para esta simulação"}
+      </div>
+      <div class="fuel-track" style="margin-top:12px"><div class="fuel-segment fuel-consumed" style="width:${f!==null && fuelL>0?clamp(usedL/fuelL*100,0,100).toFixed(1):0}%"></div><div class="fuel-segment fuel-remaining" style="width:${f!==null && fuelL>0?clamp(remainsL/fuelL*100,0,100).toFixed(1):0}%"></div></div>
+      <p class="capacity-note">Barra: parcela do combustível inicial consumida e remanescente.</p>
+    </section>`:`<div class="graph-note">Arraste <b>Distância</b> ou <b>Tempo</b> para simular a missão. Os dois controles ficarão sincronizados.</div>`;
+
+  const refill=refillL>=0?
+    `<div class="graph-refill"><span class="result-card-label">Falta para completar o tanque selecionado</span><strong>${refillL.toFixed(1)} L</strong><small>${(refillL*a.density).toFixed(1)} kg · ${(refillL*a.density*LB_PER_KG).toFixed(1)} lb</small></div>`:
+    `<div class="fuel-warning">A quantidade informada ultrapassa a capacidade em ${Math.abs(refillL).toFixed(1)} L.</div>`;
+
+  graphOut.innerHTML=`
+    <div class="graph-gauge-wrap">
+      ${fuelNeedleGauge(tankPct)}
+      <div class="graph-gauge-summary">
+        <span>Combustível no tanque<br><strong>${fuelFmt.principal}</strong></span>
+        <span>Capacidade do tanque<br><strong>${graphFuelLabel(capL,a)}</strong></span>
+        <span>Consumo horário ${flowMode==="demo"?"didático":"fixo"}<br><strong>${hourly.toFixed(1)} ${a.unit}/h</strong></span>
+      </div>
+    </div>
+    <div class="graph-metrics">
+      ${graphMetric("Autonomia estimada",fmtHora(autHours),"Sem reserva operacional")}
+      ${graphMetric("Alcance estimado",`${rangeNm.toFixed(1)} NM`,`${(rangeNm*NM_TO_KM).toFixed(0)} km · sem vento`)}
+      ${graphMetric("Velocidade simulada",`${speed.toFixed(0)} kt`,"Velocidade selecionada")}
+      ${graphMetric("Consumo horário",`${hourly.toFixed(1)} ${a.unit}/h`,flowMode==="demo"?"HIPOTÉTICO, NÃO CERTIFICADO":"Consumo constante informado")}
+    </div>
+    ${refill}
+    ${miss}
+    ${tankWarning}
+    ${flowMode==="demo"?`<div class="graph-mode-notice"><strong>Modo demonstrativo — não utilizar para planejamento de voo.</strong> A relação entre velocidade e consumo apresentada neste modo é uma simulação matemática ilustrativa, não baseada em curvas de desempenho homologadas ou extraídas dos manuais oficiais dos fabricantes das aeronaves cadastradas. Para realizar cálculos utilizando o consumo informado pelo usuário, selecione “Consumo horário constante”.</div>`:""}
+    <div class="graph-disclaimer">As alterações dos controles são instantâneas e calculadas localmente, sem internet. As faixas não representam limites certificados. Não considera reserva obrigatória, vento, densidade real, condições ambientais, táxi ou regime de potência. Em operação real, consulte RFM/POH e documentação do operador.</div>
+  `;
+}
+
+function setMode(mode){
+  const previous=activeMode;
+  activeMode=mode;
+  const isClassic=mode==="classic";
+  classicPanel.hidden=!isClassic;
+  graphicPanel.hidden=isClassic;
+  document.getElementById("modeClassic").setAttribute("aria-selected",String(isClassic));
+  document.getElementById("modeGraphic").setAttribute("aria-selected",String(!isClassic));
+  if(isClassic){
+    /* Na calculadora, preservamos o consumo horário de referência informado,
+       NÃO a curva hipotética didática do modo gráfico. */
+    if(previous==="graphic"){
+      if(graphEntryMission.changed){
+        if(graphDriver==="distance")document.getElementById("tempo").value="";
+        else document.getElementById("dist").value="";
+      }else{
+        document.getElementById("dist").value=graphEntryMission.dist;
+        document.getElementById("tempo").value=graphEntryMission.tempo;
+      }
+      calcular();
+    }
+  }else{
+    graphEntryMission={
+      dist:document.getElementById("dist").value,
+      tempo:document.getElementById("tempo").value,
+      changed:false
+    };
+    const v=Number(vel.value)||DB[heli.value].vel;
+    graphAnchorSpeed=v;
+    graphAnchorFlow=Number(cons.value)||DB[heli.value].cons;
+    graphDriver=(Number(document.getElementById("dist").value)>0)?"distance":
+      (Number(document.getElementById("tempo").value)>0?"time":"distance");
+    if(Number(document.getElementById("dist").value)>0 || Number(document.getElementById("tempo").value)>0){
+      synchronizeMission(graphDriver);
+    }
+    renderGraph();
+  }
+}
+
+function changeGraphValue(slider,targetId){
+  const val=Number(slider.value);
+  if(slider===graphConsumption){
+    const currentSpeed=Number(vel.value)||graphAnchorSpeed;
+    const ratio=graphFlowMode.value==="demo"?demoFuelFlowFactor(currentSpeed):1;
+    graphAnchorFlow=val/ratio;
+    cons.value=graphAnchorFlow.toFixed(3);
+  }else{
+    document.getElementById(targetId).value=slider.value;
+  }
+  if(slider===graphDistance)graphDriver="distance";
+  if(slider===graphTime)graphDriver="time";
+  if(slider===graphDistance || slider===graphTime || slider===graphSpeed){
+    graphEntryMission.changed=true;
+    synchronizeMission(graphDriver);
+  }
+  atualizarStatusParametros();
+  renderGraph();
+}
+
+for(const [slider,id] of [
+  [graphFuel,"fuel"],[graphSpeed,"vel"],[graphConsumption,"cons"],
+  [graphDistance,"dist"],[graphTime,"tempo"]
+]){
+  slider.addEventListener("input",()=>changeGraphValue(slider,id));
+}
+
+graphFlowMode.addEventListener("change",()=>renderGraph());
+
+graphTankConfig.addEventListener("change",()=>{
+  tankConfig.value=graphTankConfig.value;
+  atualizarCapacidade();
+  const a=DB[heli.value];
+  // Não modifica automaticamente o combustível informado quando o usuário
+  // troca de tanque: excedentes aparecem como alerta no painel gráfico.
+  renderGraph();
+});
+
+graphHeli.addEventListener("change",()=>{
+  heli.value=graphHeli.value;
+  carregar();
+  document.getElementById("fuel").value="";
+  graphAnchorSpeed=DB[heli.value].vel;
+  graphAnchorFlow=DB[heli.value].cons;
+  graphEntryMission.changed=true;
+  synchronizeMission(graphDriver);
+  renderGraph();
+});
+
+graphFuelUnit.addEventListener("change",()=>{
+  const a=DB[heli.value];
+  const old=getRawNumeric("fuel");
+  const oldLiters=old===null?null:paraLitros(old,unit.value,a.density);
+  unit.value=graphFuelUnit.value;
+  if(oldLiters!==null)document.getElementById("fuel").value=deLitros(oldLiters,unit.value,a.density).toFixed(2);
+  renderGraph();
+});
+
+graphDistUnit.addEventListener("change",()=>{
+  const old=getRawNumeric("dist");
+  const nm=old===null?null:(distUnit.value==="KM"?old/NM_TO_KM:old);
+  distUnit.value=graphDistUnit.value;
+  if(nm!==null)document.getElementById("dist").value=(distUnit.value==="KM"?nm*NM_TO_KM:nm).toFixed(3);
+  graphEntryMission.changed=true;
+  renderGraph();
+});
+
+document.getElementById("modeClassic").addEventListener("click",()=>setMode("classic"));
+document.getElementById("modeGraphic").addEventListener("click",()=>setMode("graphic"));
+setMode("classic");
 </script>
 </body>
 </html>
