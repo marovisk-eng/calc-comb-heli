@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#111820">
 <title>Calculadora de Combustível para Helicópteros — V6.5</title>
+<!-- Checkpoint interno de auditoria: V6.5-R4. Versão pública V6.5; simulador educacional, dados cadastrais não certificados. -->
 
 <style>
 :root{
@@ -812,11 +813,11 @@ select{
 <header class="app-header">
   <div class="header-inner">
     <div>
-      <p class="eyebrow">Planejamento operacional de voo</p>
+      <p class="eyebrow">Simulação educacional de voo</p>
       <h1>Calculadora de Combustível para Helicópteros</h1>
-      <p class="header-subtitle">Painel Operacional de Planejamento de Missão</p>
+      <p class="header-subtitle">Simulador de combustível e autonomia de helicópteros</p>
     </div>
-    <div class="version-chip">V6.5 Operacional</div>
+    <div class="version-chip">V6.5 · Educacional</div>
   </div>
 </header>
 
@@ -873,12 +874,12 @@ select{
 
           <div class="field">
             <label for="vel">Velocidade de cruzeiro (kt)</label>
-            <input id="vel" type="number" inputmode="decimal" min="1" step="1">
+            <input id="vel" type="number" inputmode="decimal" min="1" step="any">
           </div>
 
           <div class="field">
             <label id="consLabel" for="cons">Consumo</label>
-            <input id="cons" type="number" inputmode="decimal" min="0.1" step="0.1">
+            <input id="cons" type="number" inputmode="decimal" min="0.01" step="any">
           </div>
         </div>
 
@@ -891,7 +892,7 @@ select{
         <div class="form-grid">
           <div class="field">
             <label for="fuel">Combustível no tanque</label>
-            <input id="fuel" type="number" inputmode="decimal" min="0" step="0.1">
+            <input id="fuel" type="number" inputmode="decimal" min="0" step="any">
           </div>
 
           <div class="field">
@@ -910,13 +911,13 @@ select{
 
           <div class="field">
             <label for="capacity">Capacidade de referência</label>
-            <input id="capacity" type="number" inputmode="decimal" step="0.1">
+            <input id="capacity" type="number" inputmode="decimal" min="0.01" step="any">
             <div id="capacityNote" class="capacity-note"></div>
           </div>
 
           <div class="field">
             <label for="dist">Distância da missão</label>
-            <input id="dist" type="number" inputmode="decimal" min="0" step="0.1">
+            <input id="dist" type="number" inputmode="decimal" min="0" step="any">
           </div>
 
           <div class="field">
@@ -929,7 +930,7 @@ select{
 
           <div class="field full">
             <label for="tempo">Tempo da missão (min)</label>
-            <input id="tempo" type="number" inputmode="decimal" min="0" step="1">
+            <input id="tempo" type="number" inputmode="decimal" min="0" step="any">
           </div>
         </div>
 
@@ -945,14 +946,15 @@ select{
         <div class="panel-title-wrap">
           <span class="panel-index">02</span>
           <div>
-            <h2>Resultado operacional</h2>
-            <p class="panel-note">Resumo calculado da missão.</p>
+            <h2>Resultado da simulação</h2>
+            <p class="panel-note">Estimativas para treinamento e demonstração.</p>
           </div>
         </div>
       </header>
 
       <div class="panel-body">
         <div id="out" class="result result-dashboard"></div>
+        <div id="classicA11y" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
 
         <div class="result-placeholder">
           <div>
@@ -994,7 +996,7 @@ select{
         <div class="graph-field">
           <div class="graph-field-top"><label for="graphConsumption">Consumo por hora</label><output for="graphConsumption" id="graphConsumptionValue" class="graph-value">180,0 kg/h</output></div>
           <input id="graphConsumption" class="graph-range" type="range" min="0.01" max="360" step="0.01" value="180">
-          <div class="graph-range-ends"><span>1 /h</span><span id="graphConsumptionMax">Faixa exploratória</span></div>
+          <div class="graph-range-ends"><span id="graphConsumptionMin">0,01/h</span><span id="graphConsumptionMax">Faixa exploratória</span></div>
         </div>
         <div class="graph-field">
           <div class="graph-field-top"><label for="graphDistance">Distância da missão</label><output for="graphDistance" id="graphDistanceValue" class="graph-value">0,0 NM</output></div>
@@ -1026,8 +1028,8 @@ select{
   </section>
 
   <div class="footer-note">
-    <strong>Aviso operacional:</strong>
-    esta calculadora é uma ferramenta de apoio educacional, treinamento e planejamento. A indicação de combustível suficiente não verifica reservas operacionais, vento ou limitações de desempenho.
+    <strong>Uso educacional:</strong>
+    esta calculadora destina-se a simulações e treinamento; não deve ser utilizada para planejamento ou decisão de voo real. Os cálculos não verificam reservas operacionais, vento ou limitações de desempenho.
     Os resultados são estimativas e podem variar em função de peso bruto, altitude, temperatura,
     vento, perfil de missão, configuração operacional, estado dos motores, carga transportada
     e limitações específicas. Em operação real, prevalecem o RFM/POH, documentação oficial,
@@ -1249,6 +1251,7 @@ function readSafe(id,{positive=false,max=MAX_INPUT}={}){
 }
 function showError(title,message){
   out.innerHTML=`<section class="result-section"><h3 class="result-section-title">${title}</h3><div class="fuel-warning">${message}</div></section>`;
+  document.getElementById("classicA11y").textContent=`${title}. ${message}`;
 }
 function validDerived(...values){return values.every(v=>Number.isFinite(v)&&v>=0&&v<1e12);}
 function reasonForMission(remaining,expected){
@@ -1274,6 +1277,17 @@ function deLitros(valorL,u,density){
   return 0;
 }
 
+// Precisão proporcional: valores não nulos não devem aparecer como "0.0".
+// Mantém uma casa decimal para valores usuais; para quantidades pequenas,
+// preserva até seis algarismos significativos, incluindo notação exponencial.
+function formatarValorMedido(valor){
+  if(!Number.isFinite(valor))return "—";
+  if(valor!==0 && Math.abs(valor)<0.05){
+    return Number(valor.toPrecision(6)).toString();
+  }
+  return valor.toFixed(1);
+}
+
 function formatarCombustivel(valorL,unidadePrincipal,a){
   const valores={
     L:deLitros(valorL,"L",a.density),
@@ -1281,10 +1295,10 @@ function formatarCombustivel(valorL,unidadePrincipal,a){
     LB:deLitros(valorL,"LB",a.density)
   };
 
-  const principal=`${valores[unidadePrincipal].toFixed(1)} ${unidadePrincipal}`;
+  const principal=`${formatarValorMedido(valores[unidadePrincipal])} ${unidadePrincipal}`;
   const equivalentes=["L","KG","LB"]
     .filter(u=>u!==unidadePrincipal)
-    .map(u=>`${valores[u].toFixed(1)} ${u}`)
+    .map(u=>`${formatarValorMedido(valores[u])} ${u}`)
     .join(" · ");
 
   return {principal,equivalentes,valores};
@@ -1368,16 +1382,41 @@ function atualizarStatusParametros(){
   parameterStatus.classList.toggle("custom",!padrao);
 }
 
+function announceClassicChange(reason){
+  if(activeMode!=="classic")return;
+  const a=DB[heli.value];
+  const tank=a.tanks[Number(tankConfig.value)||0];
+  const fuelEntered=document.getElementById("fuel").value.trim();
+  const distEntered=document.getElementById("dist").value.trim();
+  document.getElementById("classicA11y").textContent=
+    `${reason}. Aeronave ${heli.value}. Tanque ${tank.name}. `+
+    `Unidade de combustível ${unitText(unit.value)}. `+
+    `Combustível informado ${fuelEntered===""?"não informado":fuelEntered+" "+unitText(unit.value)}. `+
+    `Unidade de distância ${distUnit.value}. `+
+    `Distância informada ${distEntered===""?"não informada":distEntered+" "+distUnit.value}. `+
+    `Resultados anteriores não são válidos até recalcular. Uso educacional.`;
+}
 heli.addEventListener("change",()=>{
   // Mudança de aeronave: evita reinterpretar o combustível anterior na nova unidade.
   document.getElementById("fuel").value="";
   carregar();
+  announceClassicChange("Aeronave alterada");
 });
-tankConfig.addEventListener("change",atualizarCapacidade);
+tankConfig.addEventListener("change",()=>{
+  atualizarCapacidade();
+  if(activeMode==="classic")out.innerHTML="";
+  announceClassicChange("Configuração de tanque alterada");
+});
 vel.addEventListener("input",atualizarStatusParametros);
 cons.addEventListener("input",atualizarStatusParametros);
-unit.addEventListener("change",()=>changeFuelUnit(unit.value));
-distUnit.addEventListener("change",()=>changeDistanceUnit(distUnit.value));
+unit.addEventListener("change",()=>{
+  changeFuelUnit(unit.value);
+  announceClassicChange("Unidade de combustível alterada");
+});
+distUnit.addEventListener("change",()=>{
+  changeDistanceUnit(distUnit.value);
+  announceClassicChange("Unidade de distância alterada");
+});
 
 function limitarPercentual(valor){
   return Math.min(Math.max(valor,0),100);
@@ -1458,9 +1497,9 @@ function criarSituacaoTanque(a,capacidadeL,combustivelL){
     refillHtml=`
       <div class="refill-box">
         <span class="refill-label">Abastecimento para completar</span>
-        <span class="refill-main">${faltanteL.toFixed(1)} L</span>
+        <span class="refill-main">${formatarValorMedido(faltanteL)} L</span>
         <span class="refill-equivalent">
-          ${faltaFmt.valores.KG.toFixed(1)} KG · ${faltaFmt.valores.LB.toFixed(1)} LB
+          ${formatarValorMedido(faltaFmt.valores.KG)} KG · ${formatarValorMedido(faltaFmt.valores.LB)} LB
         </span>
       </div>
     `;
@@ -1470,9 +1509,9 @@ function criarSituacaoTanque(a,capacidadeL,combustivelL){
     refillHtml=`
       <div class="fuel-warning">
         <strong>Valor informado acima da capacidade selecionada.</strong><br>
-        Excesso calculado: ${excessoL.toFixed(1)} L ·
-        ${excessoFmt.valores.KG.toFixed(1)} KG ·
-        ${excessoFmt.valores.LB.toFixed(1)} LB
+        Excesso calculado: ${formatarValorMedido(excessoL)} L ·
+        ${formatarValorMedido(excessoFmt.valores.KG)} KG ·
+        ${formatarValorMedido(excessoFmt.valores.LB)} LB
       </div>
     `;
   }
@@ -1588,7 +1627,7 @@ function calcular(){
       <div class="result-summary">
         <article class="result-card"><span class="result-card-label">Aeronave</span><span class="result-card-value">${heli.value}</span></article>
         <article class="result-card"><span class="result-card-label">Unidade operacional</span><span class="result-card-value unit-value">${a.unit}</span></article>
-        <article class="result-card"><span class="result-card-label">Velocidade</span><span class="result-card-value">${velocidade.toFixed(1)} kt</span></article>
+        <article class="result-card"><span class="result-card-label">Velocidade</span><span class="result-card-value">${sliderNumber(velocidade)} kt</span></article>
         <article class="result-card"><span class="result-card-label">Consumo informado</span><span class="result-card-value">${taxaFmt.principal}</span><span class="result-card-detail">${taxaFmt.equivalentes}</span></article>
         <article class="result-card wide"><span class="result-card-label">Configuração do tanque</span><span class="result-card-value">${a.tanks[Number(tankConfig.value)||0].name}</span><span class="result-card-detail">${capacidade.toFixed(1)} ${capacidadeUnidade} · ${a.capacityBasis}. ${a.dataStatus}.</span></article>
       </div>
@@ -1632,9 +1671,14 @@ function calcular(){
     sections.push(`<section class="result-section"><h3 class="result-section-title">Aguardando dados</h3><div class="result-card">Informe combustível, distância ou tempo para realizar um cálculo.</div></section>`);
   }
   out.innerHTML=sections.join("");
+  const states=Array.from(out.querySelectorAll(".mission-state"))
+    .map(el=>el.textContent.trim()).filter(Boolean);
+  document.getElementById("classicA11y").textContent=
+    `Resultados atualizados para ${heli.value}. ${states.join(". ") || "Confira as estimativas apresentadas."} Reserva operacional não verificada.`;
 }
 
 function limpar(){
+  document.getElementById("classicA11y").textContent="Campos da missão limpos.";
   document.getElementById("fuel").value="";
   document.getElementById("dist").value="";
   document.getElementById("tempo").value="";
@@ -1652,7 +1696,7 @@ function limpar(){
 carregar();
 
 
-/* V6.6 — Modo gráfico acoplado: preserva a calculadora operacional V6.4. */
+/* Histórico: modo gráfico iniciado no protótipo V6.6; checkpoint técnico atual de correções pós-auditoria; versão pública V6.5. */
 const graphicPanel=document.getElementById("graphicPanel");
 const classicPanel=document.getElementById("classicPanel");
 const graphHeli=document.getElementById("graphHeli");
@@ -1688,6 +1732,15 @@ function getRawNumeric(id){
 }
 
 function graphNumber(n,places=1){return Number.isFinite(n)?n.toFixed(places):"—";}
+// Controles deslizantes: não arredondar visualmente valores que continuam nos cálculos.
+function sliderNumber(value){
+  if(!Number.isFinite(value))return "—";
+  return value.toLocaleString("pt-BR",{minimumFractionDigits:0,maximumFractionDigits:10});
+}
+function sliderHourRate(value){
+  // Para taxas menores que 0,1, preservar dígitos significativos e evitar exibir "0,0".
+  return sliderNumber(value);
+}
 function clamp(n,lo,hi){return Math.max(lo,Math.min(hi,n));}
 
 /*
@@ -1738,7 +1791,7 @@ function graphData(){
   const fuelL=(f!==null&&f>=0)?paraLitros(f,unit.value,a.density):0;
   const flowMode=graphFlowMode.value;
   const multiplier=(flowMode==="demo" && speed>0)?demoFuelFlowFactor(speed):1;
-  const hourly=graphAnchorFlow*multiplier;
+  const hourly=Math.max(MIN_RATE,graphAnchorFlow*multiplier);
   const consLph=paraLitros(hourly,a.unit,a.density);
   const distNm=(d!==null&&d>0)?(distUnit.value==="KM"?d/NM_TO_KM:d):0;
   const minutes=(t!==null&&t>0)?t:0;
@@ -1821,30 +1874,34 @@ function renderGraph(){
   const maxDistNm=Math.max(300,Math.ceil((Math.max(aut*speed,distNm)*1.15)/50)*50);
   const distMax=distUnit.value==="KM"?maxDistNm*NM_TO_KM:maxDistNm;
   const maxTime=Math.max(240,Math.ceil(Math.max(aut*60,minutes)*1.12/30)*30);
+  // step=any preserva o valor original, inclusive 130,49 kt e 220,462262 lb.
   const sliders=[
-    [graphFuel,f!==null?f:0,maxFuel,.1,"graphFuelValue",`${(f||0).toFixed(1)} ${unitText(unit.value)}`],
-    [graphSpeed,speed,maxSpeed,1,"graphSpeedValue",`${speed.toFixed(0)} kt`],
-    [graphConsumption,hourly,maxCons,.01,"graphConsumptionValue",`${hourly.toFixed(1)} ${a.unit}/h`],
-    [graphDistance,d.d>0?d.d:0,Math.ceil(distMax),.001,"graphDistanceValue",`${(d.d||0).toFixed(1)} ${distUnit.value}`],
-    [graphTime,minutes,Math.ceil(maxTime),.001,"graphTimeValue",fmtHora(minutes/60)]
+    [graphFuel,f!==null?f:0,maxFuel,"any","graphFuelValue"],
+    [graphSpeed,speed,maxSpeed,"any","graphSpeedValue"],
+    [graphConsumption,hourly,maxCons,"any","graphConsumptionValue"],
+    [graphDistance,d.d>0?d.d:0,Math.ceil(distMax),"any","graphDistanceValue"],
+    [graphTime,minutes,Math.ceil(maxTime),"any","graphTimeValue"]
   ];
-  for(const [input,value,max,step,id,label] of sliders){
-    input.min=input===graphSpeed?1:(input===graphConsumption?.01:0);
+  for(const [input,value,max,step,id] of sliders){
+    // Uma taxa efetiva didática nunca será menor que o mínimo declarado.
+    input.min=input===graphSpeed?1:(input===graphConsumption?String(MIN_RATE):0);
     input.max=String(max);input.step=String(step);
     input.value=String(clamp(value,Number(input.min),max));
     input.style.setProperty("--fill",`${clamp((Number(input.value)-Number(input.min))/(max-Number(input.min))*100,0,100)}%`);
     const effective=Number(input.value);
-    const labelReal=input===graphTime?fmtHora(effective/60):
-      input===graphDistance?`${effective.toFixed(3)} ${distUnit.value}`:
-      input===graphFuel?`${effective.toFixed(1)} ${unitText(unit.value)}`:
-      input===graphSpeed?`${effective.toFixed(0)} kt`:
-      `${effective.toFixed(2)} ${a.unit}/h`;
+    const labelReal=input===graphTime?`${fmtHora(effective/60)} · ${sliderNumber(effective)} min`:
+      input===graphDistance?`${sliderNumber(effective)} ${distUnit.value}`:
+      input===graphFuel?`${sliderNumber(effective)} ${unitText(unit.value)}`:
+      input===graphSpeed?`${sliderNumber(effective)} kt`:
+      `${sliderHourRate(effective)} ${a.unit}/h`;
     document.getElementById(id).textContent=labelReal;
     input.setAttribute("aria-valuetext",labelReal);
   }
   document.getElementById("graphFuelMin").textContent=`0 ${unitText(unit.value)}`;
   document.getElementById("graphFuelMax").textContent=`${maxFuel.toFixed(1)} ${unitText(unit.value)} · escala`;
   document.getElementById("graphSpeedMax").textContent=`${maxSpeed} kt · escala exploratória`;
+  document.getElementById("graphConsumptionMin").textContent=
+    `${sliderHourRate(MIN_RATE)} ${a.unit}/h`;
   document.getElementById("graphConsumptionMax").textContent=`${maxCons} ${a.unit}/h · escala`;
   document.getElementById("graphDistanceMax").textContent=`${Math.ceil(distMax)} ${distUnit.value} · escala`;
   document.getElementById("graphTimeMax").textContent=`${Math.ceil(maxTime)} min · escala`;
@@ -1888,7 +1945,7 @@ function renderGraph(){
     </section>`:`<div class="graph-note">Arraste <b>Distância</b> ou <b>Tempo</b> para simular a missão. Os dois controles ficarão sincronizados.</div>`;
 
   const refill=refillL>=0?
-    `<div class="graph-refill"><span class="result-card-label">Falta para completar o tanque selecionado</span><strong>${refillL.toFixed(1)} L</strong><small>${(refillL*a.density).toFixed(1)} kg · ${(refillL*a.density*LB_PER_KG).toFixed(1)} lb</small></div>`:
+    `<div class="graph-refill"><span class="result-card-label">Falta para completar o tanque selecionado</span><strong>${formatarValorMedido(refillL)} L</strong><small>${formatarValorMedido(refillL*a.density)} kg · ${formatarValorMedido(refillL*a.density*LB_PER_KG)} lb</small></div>`:
     `<div class="fuel-warning">A quantidade informada ultrapassa a capacidade em ${Math.abs(refillL).toFixed(1)} L.</div>`;
 
   graphOut.innerHTML=`
@@ -1897,14 +1954,14 @@ function renderGraph(){
       <div class="graph-gauge-summary">
         <span>Combustível no tanque<br><strong>${fuelFmt.principal}</strong></span>
         <span>Capacidade do tanque<br><strong>${graphFuelLabel(capL,a)}</strong></span>
-        <span>Consumo horário ${flowMode==="demo"?"didático":"fixo"}<br><strong>${hourly.toFixed(1)} ${a.unit}/h</strong></span>
+        <span>Consumo horário ${flowMode==="demo"?"didático":"fixo"}<br><strong>${sliderHourRate(hourly)} ${a.unit}/h</strong></span>
       </div>
     </div>
     <div class="graph-metrics">
       ${graphMetric("Autonomia máxima teórica",fmtAutonomia(autHours),"Sem reserva operacional; arredondada para baixo")}
       ${graphMetric("Alcance estimado",`${rangeNm.toFixed(1)} NM`,`${(rangeNm*NM_TO_KM).toFixed(0)} km · sem vento`)}
-      ${graphMetric("Velocidade simulada",`${speed.toFixed(0)} kt`,"Velocidade selecionada")}
-      ${graphMetric("Consumo horário",`${hourly.toFixed(1)} ${a.unit}/h`,flowMode==="demo"?"HIPOTÉTICO, NÃO CERTIFICADO":"Consumo constante informado")}
+      ${graphMetric("Velocidade simulada",`${sliderNumber(speed)} kt`,"Velocidade selecionada")}
+      ${graphMetric("Consumo horário",`${sliderHourRate(hourly)} ${a.unit}/h`,flowMode==="demo"?"HIPOTÉTICO, NÃO CERTIFICADO":"Consumo constante informado")}
     </div>
     ${refill}
     ${miss}
@@ -1961,8 +2018,8 @@ function changeGraphValue(slider,targetId){
   if(slider===graphConsumption){
     const currentSpeed=Number(vel.value)||graphAnchorSpeed;
     const ratio=graphFlowMode.value==="demo"?demoFuelFlowFactor(currentSpeed):1;
-    graphAnchorFlow=val/ratio;
-    cons.value=graphAnchorFlow.toFixed(3);
+    graphAnchorFlow=Math.max(MIN_RATE,val/ratio);
+    cons.value=String(Number(graphAnchorFlow.toPrecision(12)));
   }else{
     document.getElementById(targetId).value=slider.value;
   }
@@ -2037,13 +2094,26 @@ function announceGraphic(){
   const d=graphData();
   const hours=graphDriver==="time"?d.minutes/60:d.distNm/d.speed;
   const remain=d.fuelL-hours*d.consLph;
+  const tank=d.a.tanks[Number(tankConfig.value)||0];
+  const current=readSafe("fuel");
+  const fuelLabel=current.empty?"não informado":`${sliderNumber(current.value)} ${unitText(unit.value)}`;
+  const distance=readSafe("dist");
+  const missionLabel=distance.empty?"não informada":`${sliderNumber(distance.value)} ${distUnit.value}`;
   document.getElementById("graphA11y").textContent=
-    `${heli.value}. Combustível ${(d.fuelL*d.a.density).toFixed(1)} quilogramas. `+
-    `Tempo ${fmtHora(hours)}. Consumo estimado ${(hours*d.consLph*d.a.density).toFixed(1)} quilogramas. `+
-    `Saldo ${remain.toFixed(1)} litros equivalentes. Reserva não verificada.`;
+    `Aeronave ${heli.value}. Tanque ${tank.name}. `+
+    `Combustível ${fuelLabel}. Unidade selecionada ${unitText(unit.value)}. `+
+    `Distância ${missionLabel}. Unidade de distância ${distUnit.value}. `+
+    `Consumo por hora ${sliderHourRate(d.hourly)} ${d.a.unit}/h. `+
+    `Regime ${d.flowMode==="demo"?"curva hipotética didática":"consumo constante"}. `+
+    `Tempo estimado ${fmtHora(hours)}. Consumo da missão ${formatarValorMedido(hours*d.consLph*d.a.density)} quilogramas. `+
+    `Saldo ${formatarValorMedido(remain)} litros equivalentes. Reserva não verificada.`;
 }
 for(const slider of [graphFuel,graphSpeed,graphConsumption,graphDistance,graphTime]){
   slider.addEventListener("change",announceGraphic);
+}
+// Os seletores também alteram resultados e precisam de anúncio acessível.
+for(const selector of [graphHeli,graphTankConfig,graphFuelUnit,graphDistUnit,graphFlowMode]){
+  selector.addEventListener("change",announceGraphic);
 }
 document.getElementById("modeClassic").addEventListener("click",()=>setMode("classic"));
 document.getElementById("modeGraphic").addEventListener("click",()=>setMode("graphic"));
